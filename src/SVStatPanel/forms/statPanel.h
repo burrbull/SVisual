@@ -59,21 +59,21 @@ private:
 		QString sign;
 		QString name;	
 		QMap<int, valSData> valData;
-		QVector<QPair<int, int>> hist;
+		std::vector<std::pair<int, int>> hist;
 	};
 
 			
 	bool diapEna_ = false;
 
 	QMap<QString, graphSignData> sign_;
-	QVector<SV_Cng::recData> vars_;
+	std::vector<SV_Cng::recData> vars_;
 
-	QVector<SV_Cng::recData> getSignData(QString sign);
+	std::vector<SV_Cng::recData> getSignData(QString sign);
 	void listTimeUpdate(QString sname, int val);
-	QVector<QPair<int, int>> calcHist(QString sname);
+	std::vector<std::pair<int, int>> calcHist(QString sname);
 
 	// Mx Hist
-	int Mx(QVector<QPair<int, int>>& hist);
+	int Mx(std::vector<std::pair<int, int>>& hist);
 	
 private slots:
 	void dragEnterEvent(QDragEnterEvent *event);

@@ -306,7 +306,7 @@ void MainWin::Connect(){
                 txtStream << "locate = " << geom.x() << " " << geom.y() << " " << geom.width() << " " << geom.height() << endl;
             }
                         
-            QVector<QVector<QString>> signs = SV_Graph::getLocateSignals(graphPanels_[w]);
+            std::vector<std::vector<QString>> signs = SV_Graph::getLocateSignals(graphPanels_[w]);
             for (int i = 0; i < signs.size(); ++i){
 
                 txtStream << "section" << i << " = ";

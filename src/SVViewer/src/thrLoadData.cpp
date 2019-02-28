@@ -113,7 +113,7 @@ bool MainWin::loadModuleVals(QString path){
             if (!fileRef_[path]->signls.contains(sign))
                 fileRef_[path]->signls.insert(sign, fileData::fsd{ false, 0 });
 
-            fileRef_[path]->signls[sign].patchApos.append(QPair<int, int>(patchNum, cPos));
+            fileRef_[path]->signls[sign].patchApos.push_back(std::pair<int, int>(patchNum, cPos));
             fileRef_[path]->signls[sign].vlsCnt += vr->vlCnt;
 
             if (signalRef_.contains(sign)){

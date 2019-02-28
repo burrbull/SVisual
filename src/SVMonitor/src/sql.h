@@ -56,7 +56,7 @@ public:
 	
 	bool saveTriggers(const std::map<std::string, SV_Cng::triggerData*>& trg);
 
-	QVector<SV_Cng::triggerData*> getTrigger(const QString& signal, const QString& module);
+	std::vector<SV_Cng::triggerData*> getTrigger(const QString& signal, const QString& module);
 	SV_Cng::triggerData* getTrigger(const QString& trname);
 	void delTrigger(const QString& trname);
 	
@@ -67,5 +67,5 @@ public:
 	userEventData getUserEventData(QString name);
 
 	void saveEvent(QString trigger, QDateTime dt);
-	QVector<uEvent> getEvents(QDateTime beginTime, QDateTime endTime);
+	std::vector<uEvent> getEvents(QDateTime beginTime, QDateTime endTime);
 };

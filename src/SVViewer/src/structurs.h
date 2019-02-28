@@ -44,7 +44,7 @@ struct fileData{
 	struct fsd{
 		bool isLoad;
 		int vlsCnt;
-		QVector<QPair<int, int>> patchApos;
+		std::vector<std::pair<int, int>> patchApos;
 	};
 
 	QMap<QString, fsd> signls;

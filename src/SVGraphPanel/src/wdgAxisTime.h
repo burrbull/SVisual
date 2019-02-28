@@ -38,7 +38,7 @@ private:
 	int fontMetr_ = 0;
 	int curIntervSec_ = 0;
 
-	QPair<qint64, qint64> tmInterval_;
+	std::pair<qint64, qint64> tmInterval_;
 		
 	double tmScale_ = 1.0;
 
@@ -59,11 +59,11 @@ public:
 
 	void setTimeInterval(qint64, qint64);
 
-	QPair<qint64, qint64> getTimeInterval();
+	std::pair<qint64, qint64> getTimeInterval();
 
 	double getTimeScale();
 
-	QVector<int> getAxisMark();
+	std::vector<int> getAxisMark();
 
 	void mouseMoveEvent(QMouseEvent * event);
 	void mousePressEvent(QMouseEvent * event);

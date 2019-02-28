@@ -199,7 +199,7 @@ void wdgAxisTime::setTimeInterval(qint64 beginTime, qint64 endTime){
 	else if (curDashStep_ < fontMetr_ * 1.1) curDashStep_ = 2 * fontMetr_;
 }
 
-QPair<qint64, qint64> wdgAxisTime::getTimeInterval(){
+std::pair<qint64, qint64> wdgAxisTime::getTimeInterval(){
 
 	return tmInterval_;
 
@@ -211,9 +211,9 @@ double wdgAxisTime::getTimeScale(){
 
 }
 
-QVector<int> wdgAxisTime::getAxisMark(){
+std::vector<int> wdgAxisTime::getAxisMark(){
 
-	QVector<int> mark;
+	std::vector<int> mark;
 	
 	int w = width();
 

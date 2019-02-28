@@ -39,7 +39,7 @@ private:
 	int curOffsPos_ = 0;
 	int curInterv_ = 0;
 
-	QPair<double, double> valInterval_;
+	std::pair<double, double> valInterval_;
 
 	double scale_ = 1.0;
 
@@ -60,11 +60,11 @@ public:
 
 	void setValInterval(double min, double max);
 
-	QPair<double, double> getValInterval();
+	std::pair<double, double> getValInterval();
 
 	double getValScale();
 
-	QVector<int> getAxisMark();
+	std::vector<int> getAxisMark();
 
 	void mouseMoveEvent(QMouseEvent * event);
 	void mousePressEvent(QMouseEvent * event);

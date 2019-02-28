@@ -37,27 +37,16 @@ wdgGraphHist::wdgGraphHist(QWidget *parent){
 }
 wdgGraphHist::~wdgGraphHist(){}
 
-void wdgGraphHist::setGraphPnt(QVector<QPair<int, int>> pnts){
+void wdgGraphHist::setGraphPnt(std::vector<std::pair<int, int>> pnts){
 
 	grPnts_ = pnts;
 
 	update();
 }
 
-void wdgGraphHist::setGraphPnt(vector<pair<int, int>> pnts){
-
-	grPnts_.clear();
-
-	int sz = pnts.size();
-	for (int i = 0; i < sz; ++i)		
-		grPnts_.push_back(QPair<int, int>(pnts[i].first, pnts[i].second));
-	
-	update();
-}
-
 void wdgGraphHist::paintEvent(QPaintEvent *event){
 	
-	if (grPnts_.isEmpty()) return;
+	if (grPnts_.empty()) return;
 
 	double maxX = INT32_MIN, maxY = INT32_MIN;
 	

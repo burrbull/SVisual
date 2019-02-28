@@ -60,7 +60,7 @@ namespace SV_Stat {
 	typedef bool(*pf_loadSignalData)(const QString& sign);
 	SVSTATPANEL_API void setLoadSignalData(QDialog* stPanel, pf_loadSignalData f);
 
-	typedef QPair<qint64, qint64>(*pf_getTimeInterval)();
+	typedef std::pair<qint64, qint64>(*pf_getTimeInterval)();
 	SVSTATPANEL_API void setGetTimeInterval(QDialog* stPanel, pf_getTimeInterval f);
 
 	typedef void(*pf_setTimeInterval)(qint64, qint64);

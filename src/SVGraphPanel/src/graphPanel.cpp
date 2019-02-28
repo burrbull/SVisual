@@ -156,7 +156,7 @@ void graphPanel::addGraph(QString sign){
 	graph->setObjectName("graph_" + QString::number(graphCnt_));
 	++graphCnt_;
 		
-	graphObj_.append(graph);
+	graphObj_.push_back(graph);
 	
 	splitterGraph_->addWidget(graph);
 
@@ -236,7 +236,7 @@ void graphPanel::dropEvent(QDropEvent *event)
 				pfLoadSignalData(sign);
 
 			if (lb) lb->req_delSignal(sign);
-			if (graphObj_.isEmpty()){
+			if (graphObj_.empty()){
 
 				ui.axisTime->setTimeInterval(sd->buffMinTime, sd->buffMaxTime);
 				
@@ -261,11 +261,11 @@ void graphPanel::tableUpdate(wdgGraph* graph){
 
 	int leftMarkP = leftMarkPos.x(), rightMarkP = rightMarkPos.x();
 
-	QPair<qint64, qint64> tmInterv = ui.axisTime->getTimeInterval();
+	std::pair<qint64, qint64> tmInterv = ui.axisTime->getTimeInterval();
 	double tmScale = ui.axisTime->getTimeScale();
 
-	QVector<wdgGraph::graphSignPoint> leftMarkVal = graph->getSignalValueByMarkerPos(leftMarkP);
-	QVector<wdgGraph::graphSignPoint> rightMarkVal = graph->getSignalValueByMarkerPos(rightMarkP);
+	std::vector<wdgGraph::graphSignPoint> leftMarkVal = graph->getSignalValueByMarkerPos(leftMarkP);
+	std::vector<wdgGraph::graphSignPoint> rightMarkVal = graph->getSignalValueByMarkerPos(rightMarkP);
 
 	QString x1 = QDateTime::fromMSecsSinceEpoch(leftMarkP * tmScale + tmInterv.first).toString("dd.MM.yy hh:mm:ss:zzz");
 	QString x2 = QDateTime::fromMSecsSinceEpoch(rightMarkP * tmScale + tmInterv.first).toString("dd.MM.yy hh:mm:ss:zzz");
@@ -309,11 +309,11 @@ void graphPanel::tableUpdateAlter(wdgGraph* graph){
 		
 	int leftMarkP = leftMarkPos.x(), rightMarkP = rightMarkPos.x();
 
-	QPair<qint64, qint64> tmInterv = ui.axisTime->getTimeInterval();
+	std::pair<qint64, qint64> tmInterv = ui.axisTime->getTimeInterval();
 	double tmScale = ui.axisTime->getTimeScale();
 
-	QVector<wdgGraph::graphSignPoint> leftMarkVal = graph->getSignalAlterValueByMarkerPos(leftMarkP);
-	QVector<wdgGraph::graphSignPoint> rightMarkVal = graph->getSignalAlterValueByMarkerPos(rightMarkP);
+	std::vector<wdgGraph::graphSignPoint> leftMarkVal = graph->getSignalAlterValueByMarkerPos(leftMarkP);
+	std::vector<wdgGraph::graphSignPoint> rightMarkVal = graph->getSignalAlterValueByMarkerPos(rightMarkP);
 
 	QString x1 = QDateTime::fromMSecsSinceEpoch(leftMarkP * tmScale + tmInterv.first).toString("dd.MM.yy hh:mm:ss:zzz");
 	QString x2 = QDateTime::fromMSecsSinceEpoch(rightMarkP * tmScale + tmInterv.first).toString("dd.MM.yy hh:mm:ss:zzz");
@@ -354,7 +354,7 @@ void graphPanel::tableUpdateAlter(wdgGraph* graph){
 
 void graphPanel::diapTimeUpdate(){
 
-	QPair<qint64, qint64> tIntl = ui.axisTime->getTimeInterval();
+	std::pair<qint64, qint64> tIntl = ui.axisTime->getTimeInterval();
 
 	ui.dTimeBegin->setDateTime(QDateTime::fromMSecsSinceEpoch(tIntl.first));
 	ui.dTimeEnd->setDateTime(QDateTime::fromMSecsSinceEpoch(tIntl.second));
@@ -418,10 +418,10 @@ void graphPanel::closeGraph(){
 	
 	if (obj){
 		int sz = graphObj_.size();
-		for (int i = 0; i < sz; ++i){
-			if (graphObj_[i]->objectName() == obj->objectName()){
+		for (auto it = graphObj_.begin(); it != graphObj_.end(); ++it){
+			if ((*it)->objectName() == obj->objectName()){
 								
-				graphObj_.remove(i);
+				graphObj_.erase(it);
 				sz--;
 				break;
 			}
@@ -473,7 +473,7 @@ void graphPanel::colorUpdate(){
 
 void graphPanel::updateSignals(){
 	
-	if (graphObj_.isEmpty() || !isPlay_) return;
+	if (graphObj_.empty() || !isPlay_) return;
 
     if (ui.btnAScale->isChecked()){
         for (auto ob : graphObj_)
@@ -482,7 +482,7 @@ void graphPanel::updateSignals(){
 
 	qint64 bTm = QDateTime::currentDateTime().toMSecsSinceEpoch() - SV_CYCLESAVE_MS;
 	
-	QPair<qint64, qint64> tmIntl = ui.axisTime->getTimeInterval();
+	std::pair<qint64, qint64> tmIntl = ui.axisTime->getTimeInterval();
 		
     ui.axisTime->setTimeInterval(bTm - (tmIntl.second - tmIntl.first), bTm);
 	
@@ -536,7 +536,7 @@ void graphPanel::graphToDn(QString obj){
 	}
 }
 
-QPair<qint64, qint64> graphPanel::getTimeInterval(){
+std::pair<qint64, qint64> graphPanel::getTimeInterval(){
 
 	return ui.axisTime->getTimeInterval();
 
@@ -548,9 +548,9 @@ void graphPanel::setTimeInterval(qint64 stTime, qint64 enTime){
 
 }
 
-QVector<QVector<QString>> graphPanel::getLocateSignals(){
+std::vector<std::vector<QString>> graphPanel::getLocateSignals(){
 
-    QVector<QVector<QString>> res;
+    std::vector<std::vector<QString>> res;
     for (auto ob : graphObj_){
 
         int ind = splitterGraph_->indexOf(ob);
@@ -562,7 +562,7 @@ QVector<QVector<QString>> graphPanel::getLocateSignals(){
         signs.append(ob->getAllAlterSignals());
 
         for (auto& s : signs)
-            res[ind].append(s);
+            res[ind].push_back(s);
     }
 
     return res;

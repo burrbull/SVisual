@@ -184,7 +184,7 @@ void wdgAxisValue::setValInterval(double minv, double maxv){
 	scale_ = (valInterval_.second - valInterval_.first) / height();
 }
 
-QPair<double, double> wdgAxisValue::getValInterval(){
+std::pair<double, double> wdgAxisValue::getValInterval(){
 
 	return valInterval_;
 
@@ -195,9 +195,9 @@ double wdgAxisValue::getValScale(){
 	return scale_;
 }
 
-QVector<int> wdgAxisValue::getAxisMark(){
+std::vector<int> wdgAxisValue::getAxisMark(){
 
-	QVector<int> mark;
+	std::vector<int> mark;
 
 	int h = height();
 

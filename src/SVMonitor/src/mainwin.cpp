@@ -193,7 +193,7 @@ void MainWin::Connect(){
             auto tmIntl = SV_Graph::getTimeInterval(graphPanels_[w]);
             txtStream << "tmDiap = " << (tmIntl.second - tmIntl.first) << endl;
 
-            QVector<QVector<QString>> signs = SV_Graph::getLocateSignals(graphPanels_[w]);
+            std::vector<std::vector<QString>> signs = SV_Graph::getLocateSignals(graphPanels_[w]);
             for (int i = 0; i < signs.size(); ++i){
 
                 txtStream << "section" << i << " = ";
@@ -879,9 +879,9 @@ userEventData* MainWin::getUserData(QString trgName){
 	return userEvents_.contains(trgName) ? &userEvents_[trgName] : nullptr;
 }
 
-QVector<uEvent> MainWin::getEvents(QDateTime bg, QDateTime en){
+std::vector<uEvent> MainWin::getEvents(QDateTime bg, QDateTime en){
 
-	return db ? db->getEvents(bg, en) : QVector<uEvent>();
+	return db ? db->getEvents(bg, en) : std::vector<uEvent>();
 }
 
 QDialog* MainWin::addNewWindow(const QRect& pos){

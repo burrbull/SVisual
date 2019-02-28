@@ -41,7 +41,7 @@ private:
 
 	const int MIN_HEIGHT_GRAPH = 300;
 	int graphCnt_ = 0;
-	QVector<wdgGraph*> graphObj_;
+	std::vector<wdgGraph*> graphObj_;
 
 	QSplitter* splitterGraph_ = nullptr;
 	wdgGraph* selGraph_ = nullptr;
@@ -63,9 +63,9 @@ public:
 	SV_Graph::pf_loadSignalData pfLoadSignalData= nullptr;
 
     void addSignalOnGraph(QString name, int section);
-	QPair<qint64, qint64> getTimeInterval();
+	std::pair<qint64, qint64> getTimeInterval();
 	void setTimeInterval(qint64 stTime, qint64 enTime);
-    QVector<QVector<QString>> getLocateSignals();
+    std::vector<std::vector<QString>> getLocateSignals();
 
 public slots:
 	void updateSignals();

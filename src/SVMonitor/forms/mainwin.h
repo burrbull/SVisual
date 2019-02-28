@@ -78,7 +78,7 @@ public:
 	void delUserData(QString);
 	userEventData* getUserData(QString);
 
-	QVector<uEvent> getEvents(QDateTime, QDateTime);
+	std::vector<uEvent> getEvents(QDateTime, QDateTime);
 
 private:
 

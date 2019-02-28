@@ -197,14 +197,14 @@ bool sql::saveTriggers(const std::map<std::string, triggerData*>& trgData){
 	return true;
 }
 
-QVector<SV_Cng::triggerData*> sql::getTrigger(const QString& signal, const QString& module){
+std::vector<SV_Cng::triggerData*> sql::getTrigger(const QString& signal, const QString& module){
 
 	stringstream ss;
 
 	ss << "SELECT * FROM Trigger WHERE signal = '" << signal.toUtf8().data() <<
 		"' AND module = '" << module.toUtf8().data() << "'; ";
 
-	vector<vector<string>> trg; QVector<triggerData*> res;
+	vector<vector<string>> trg; std::vector<triggerData*> res;
 	if (!Query(ss.str(), trg)) return res;
 
 	int sz = trg.size();
@@ -379,11 +379,11 @@ void sql::saveEvent(QString trg, QDateTime dt){
 	Query(ss.str(), ret);
 }
 
-QVector<uEvent> sql::getEvents(QDateTime beginDT, QDateTime endDT){
+std::vector<uEvent> sql::getEvents(QDateTime beginDT, QDateTime endDT){
 
 	QString cmd = "SELECT * FROM Events WHERE sendDateTime BETWEEN '" + beginDT.toString("yyyy-MM-dd HH:mm:ss") + "' AND '" + endDT.toString("yyyy-MM-dd HH:mm:ss") + "';";
 
-	vector<vector<string>> evt; QVector<uEvent> res;
+	vector<vector<string>> evt; std::vector<uEvent> res;
 	if (!Query(cmd.toStdString(), evt)) return res;
 
 	int sz = evt.size(); res.reserve(sz); QSet<QString> trgs;

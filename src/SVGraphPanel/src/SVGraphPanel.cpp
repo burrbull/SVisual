@@ -66,12 +66,12 @@ namespace SV_Graph {
 			((graphPanel*) gp)->updateSignals();
 	}
 
-	QPair<qint64, qint64> getTimeInterval(QWidget *gp) {
+	std::pair<qint64, qint64> getTimeInterval(QWidget *gp) {
 
 		if (gp)
 			return ((graphPanel*) gp)->getTimeInterval();
 
-		return QPair<qint64, qint64>();
+		return std::pair<qint64, qint64>();
 	}
 
 	void setTimeInterval(QWidget* gp, qint64 stTime, qint64 enTime) {
@@ -86,9 +86,9 @@ namespace SV_Graph {
 		}
 	}
 
-    QVector<QVector<QString>> getLocateSignals(QWidget *gp){
+    std::vector<std::vector<QString>> getLocateSignals(QWidget *gp){
 
-        return gp ? ((graphPanel*)gp)->getLocateSignals() : QVector<QVector<QString>>();
+        return gp ? ((graphPanel*)gp)->getLocateSignals() : std::vector<std::vector<QString>>();
 
     }
 }

@@ -48,12 +48,12 @@ private:
 		QLabel* lb;
 		QLabel* lbLeftMarkVal;
 		QLabel* lbRightMarkVal;
-		QVector<QVector<QPair<int, int>>> pnts;
+		std::vector<std::vector<std::pair<int, int>>> pnts;
 	};
 
 	struct histPos{
-		QPair<double, double> valIntl;
-		QPair<qint64, qint64> tmIntl;
+		std::pair<double, double> valIntl;
+		std::pair<qint64, qint64> tmIntl;
 	};
 
 	QImage imSign_;
@@ -66,9 +66,9 @@ private:
 	QMap <QString, graphSignData> signals_, signalsAlter_;
 	QStringList signalList_, signalListAlter_;
 		
-	QVector<QVector<QPair<int, int>>> getSignalPnt(SV_Cng::signalData* sign, bool isAlter = false);
-	QPair<double, double > getSignMaxMinValue(graphSignData* sign);
-	QPair<double, double> getSignMaxMinValue(SV_Cng::signalData* sign, QPair<qint64, qint64>& tmInterval);
+	std::vector<std::vector<std::pair<int, int>>> getSignalPnt(SV_Cng::signalData* sign, bool isAlter = false);
+	std::pair<double, double > getSignMaxMinValue(graphSignData* sign);
+	std::pair<double, double> getSignMaxMinValue(SV_Cng::signalData* sign, std::pair<qint64, qint64>& tmInterval);
 	void addPosToHistory();
 
 	wdgAxisTime* axisTime_ = NULL;
@@ -78,7 +78,7 @@ private:
 	
 	bool eventFilter(QObject *target, QEvent *event);
 
-	QVector<histPos> historyPos_;
+	std::vector<histPos> historyPos_;
 	graphPanel* grPanel_ = nullptr;
     SV_Graph::config cng;
 
@@ -110,8 +110,8 @@ public:
 	
 	void setMarkersPos(QPoint left, QPoint right);
 	void getMarkersPos(QPoint& left, QPoint& right);
-	QVector<graphSignPoint> getSignalValueByMarkerPos(int pos);
-	QVector<wdgGraph::graphSignPoint> getSignalAlterValueByMarkerPos(int pos);
+	std::vector<graphSignPoint> getSignalValueByMarkerPos(int pos);
+	std::vector<wdgGraph::graphSignPoint> getSignalAlterValueByMarkerPos(int pos);
 	void addSignal(QString sign);
 	void addAlterSignal(QString sign);
 	QStringList getAllSignals();

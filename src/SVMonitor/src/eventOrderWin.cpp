@@ -47,7 +47,7 @@ eventOrderWin::~eventOrderWin(){}
 
 void eventOrderWin::showOrder(){
 		
-	QVector<uEvent> events = mainWin_->getEvents(ui.txtBeginDate->dateTime(), ui.txtEndDate->dateTime());
+	std::vector<uEvent> events = mainWin_->getEvents(ui.txtBeginDate->dateTime(), ui.txtEndDate->dateTime());
 
 	ui.tableEvents->clearContents();
 	int sz = events.size(), rowCnt = ui.tableEvents->rowCount();

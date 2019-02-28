@@ -93,21 +93,21 @@ void statPanel::selectSignalChange(){
 	graphValueChange();
 }
 
-QVector<recData> statPanel::getSignData(QString sname){
+std::vector<recData> statPanel::getSignData(QString sname){
 		
 	signalData* sdata = pfGetSignalData(sname);
 
 	if (!ui.chbWinDiap->isChecked()){
 
 		int sz = sdata->buffData.size();
-		QVector<recData> res(sz);
+		std::vector<recData> res(sz);
 		for (int i =0; i < sz; ++i)
 			res[i] = sdata->buffData[i];
 
 		return res;
 	}
 
-	QPair<qint64, qint64> tmInterval = pfGetTimeInterval ? pfGetTimeInterval() : QPair<qint64, qint64>();
+	std::pair<qint64, qint64> tmInterval = pfGetTimeInterval ? pfGetTimeInterval() : std::pair<qint64, qint64>();
 		
 	int znSz = sdata->buffData.size();
 
@@ -116,10 +116,10 @@ QVector<recData> statPanel::getSignData(QString sname){
 		tmMinInterval = tmInterval.first,
 		tmMaxInterval = tmInterval.second;
 
-	if ((tmZnBegin >= tmMaxInterval) || (tmZnEnd <= tmMinInterval)) return QVector<recData>();
+	if ((tmZnBegin >= tmMaxInterval) || (tmZnEnd <= tmMinInterval)) return std::vector<recData>();
 
 
-	QVector<recData> res;
+	std::vector<recData> res;
 		
 	tmZnEnd = sdata->buffData[0].beginTime + SV_CYCLESAVE_MS;
 	uint64_t tmZnEndPrev = sdata->buffData[0].beginTime;
@@ -128,7 +128,7 @@ QVector<recData> statPanel::getSignData(QString sname){
 	while (tmZnBegin < tmMaxInterval){
 
 		if (tmZnEnd > tmMinInterval){
-			res.append(sdata->buffData[z]);
+			res.push_back(sdata->buffData[z]);
 		}
 
 		z++;
@@ -195,7 +195,7 @@ void statPanel::dropEvent(QDropEvent *event)
 	}
 }
 
-QVector<QPair<int,int>> statPanel::calcHist(QString sname){
+std::vector<std::pair<int,int>> statPanel::calcHist(QString sname){
 		
 	vars_ = getSignData(sname);
 
@@ -318,13 +318,13 @@ QVector<QPair<int,int>> statPanel::calcHist(QString sname){
 				}
 			break;
 
-			case valueType::tInt:			
+			case valueType::tInt:
 				for (int i = 0; i < sz; ++i){
 
 					for (int j = 0; j < SV_PACKETSZ; ++j){
 					
 						int val = vars_[i].vals[j].tInt;
-												
+
 						if (!hist.contains(val)){
 							hist.insert(val, 1);
 							sign_[sname].valData.insert(val, valSData{ 1, 1 });
@@ -363,20 +363,20 @@ QVector<QPair<int,int>> statPanel::calcHist(QString sname){
 				break;
 			default:
 				break;
-		}	
+		}
 	}
 
-	QVector<QPair<int, int>> res;
+	std::vector<std::pair<int, int>> res;
 	QList<int> keys = hist.keys(); int sz = keys.size();
 	for (int i = 0; i < sz; ++i){
 
-		res.append(QPair<int,int>(keys[i], hist[keys[i]]));		
+		res.push_back(std::pair<int,int>(keys[i], hist[keys[i]]));		
 
 		sign_[sname].valData[keys[i]].duration *= SV_CYCLEREC_MS;
 
 		sign_[sname].valData[keys[i]].durationMean = (double)sign_[sname].valData[keys[i]].duration / sign_[sname].valData[keys[i]].changeCnt + 0.5;
-	}	
-			
+	}
+
 	return res;
 }
 
@@ -486,7 +486,7 @@ void statPanel::selectSignalTime(int row){
 }
 
 // Mx Hist
-int statPanel::Mx(QVector<QPair<int, int>>& hist)
+int statPanel::Mx(std::vector<std::pair<int, int>>& hist)
 {
 	int64_t Square = 0;
 	int64_t Mx = 0;

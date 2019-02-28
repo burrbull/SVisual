@@ -63,7 +63,7 @@ bool client::connect(const char* moduleName, const char* ipAddr, int port){
 	portServ_ = port;
 
 	isConnect_ = SV_TcpCln::connect(ipAddr, port);
-			
+
 	if (isConnect_){
         thr_ = std::thread([](client *lp) { lp->sendCyc(); }, this);
 	}
@@ -85,7 +85,7 @@ bool client::addValue(const char* name, SV_Cng::valueType type, SV_Cng::value va
 	if (!isConnect_) return false;
 
 	bool ok = true;
-		
+
 	if (values_.find(name) == values_.end()){
 
 		if ((strlen(name) == 0) || (strlen(name) >= SV_NAMESZ)){
@@ -127,7 +127,7 @@ bool client::addValue(const char* name, SV_Cng::valueType type, SV_Cng::value va
 }
 
 bool client::sendData(){
-		
+
 	if (values_.empty()) return true;
 
 	size_t SINT = sizeof(int), vlSz = SV_NAMESZ + SINT + SINT * SV_PACKETSZ,
@@ -135,7 +135,7 @@ bool client::sendData(){
            startSz = 7, endSz = 5,
            arrSz = startSz + SINT + dataSz + endSz,
            offs = 0;
-	
+
     char* arr = new char[arrSz];
     memset(arr, 0, arrSz);
 
@@ -144,17 +144,17 @@ bool client::sendData(){
 	memcpy(arr + offs, &dataSz, SINT); offs += SINT;
 
 	memcpy(arr + offs, module_.data(), SV_NAMESZ); offs += SV_NAMESZ;
-		
+
 	int cnt = 0;
-	for (auto& it : values_){
-				
+	for (auto& it : values_) {
+
 		memcpy(arr + offs + vlSz*cnt, it.second->name, SV_NAMESZ);
 		memcpy(arr + offs + vlSz*cnt + SV_NAMESZ, &it.second->type, SINT);
 		memcpy(arr + offs + vlSz*cnt + SV_NAMESZ + SINT, it.second->vals, SV_PACKETSZ * SINT);
 
 		++cnt;
 	}
-		
+
 	memcpy(arr + offs + vlSz*cnt, "=end=", endSz);
 
     string out;
@@ -168,11 +168,10 @@ bool client::sendData(){
 
 void client::sendCyc(){
 
-
 	uint64_t cTm = SV_Aux::CurrDateTimeSinceEpochMs(), prevTm = cTm, tmDiff = SV_CYCLEREC_MS;
-		
+
 	while (!thrStop_ ){
-		
+
 		if (!isConnect_)
 			isConnect_ = SV_TcpCln::connect(addrServ_, portServ_);
 
@@ -183,18 +182,18 @@ void client::sendCyc(){
 		isWrite_ = true;
 
 		int prevCyc = curCycCnt_ - 1; if (prevCyc < 0) prevCyc = SV_PACKETSZ - 1;
-		for (auto it = values_.begin(); it != values_.end(); ++it){
-						
-			if (!it->second->isActive){
-				it->second->vals[curCycCnt_] = it->second->vals[prevCyc];
-								
-				if ((it->second->type == SV_Cng::valueType::tBool) && it->second->isOnlyFront)
-					it->second->vals[curCycCnt_].tBool = false;
+		for (auto& it : values_) {
+
+			if (!it.second->isActive) {
+				it.second->vals[curCycCnt_] = it.second->vals[prevCyc];
+
+				if ((it.second->type == SV_Cng::valueType::tBool) && it.second->isOnlyFront)
+					it.second->vals[curCycCnt_].tBool = false;
 			}
-					
-			it->second->isActive = false;
+
+			it.second->isActive = false;
 		}
-		
+
 		int next = curCycCnt_ + 1;
 		
 		if (next >= SV_PACKETSZ) {
