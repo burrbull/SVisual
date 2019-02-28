@@ -29,19 +29,15 @@
 client clientObj;
 
 namespace SV_Cln {
-
     bool svConnect(const char *moduleName, const char *ipAddr, int port) {
-
         return clientObj.connect(moduleName, ipAddr, port);
     }
 
     void svDisconnect() {
-
         clientObj.disconnect();
     }
 
     bool svAddBoolValue(const char *name, bool value_in, bool onlyPosFront) {
-
         SV_Cng::value val;
         val.tBool = value_in;
 
@@ -49,7 +45,6 @@ namespace SV_Cln {
     }
 
     bool svAddIntValue(const char *name, int value_in) {
-
         SV_Cng::value val;
         val.tInt = value_in;
 
@@ -57,7 +52,6 @@ namespace SV_Cln {
     }
 
     bool svAddFloatValue(const char *name, float value_in) {
-
         SV_Cng::value val;
         val.tFloat = value_in;
 
@@ -65,7 +59,6 @@ namespace SV_Cln {
     }
 
     bool svSetParam(int cycleRecMs, int packetSz) {
-
         clientObj.setConfig(client::config(cycleRecMs, packetSz));
 
         return true;

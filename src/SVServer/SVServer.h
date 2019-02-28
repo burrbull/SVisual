@@ -37,12 +37,9 @@
    #define SVSRV_API
 #endif
 
-
 namespace SV_Srv {
-
     /// конфиг
     struct config {
-
         bool outArchiveEna;          ///< запись архива активна
         std::string outArchivePath;  ///< запись архива путь
         std::string outArchiveName;  ///< запись архива имя файла
@@ -59,7 +56,7 @@ namespace SV_Srv {
                 cycleRecMs(100),
                 packetSz(10) {}
     };
-        
+
     /// задать статус callback
     /// \param pfStatusMess
     typedef void(*statusCBack)(const std::string& mess);
@@ -116,7 +113,6 @@ namespace SV_Srv {
     /// \param sign = name + module
     /// \return true - ok
     SVSRV_API bool signalBufferEna(const std::string& sign);
-
 
     // вернуть все триггеры
     SVSRV_API std::map<std::string, SV_Cng::triggerData*> getCopyTriggerRef();

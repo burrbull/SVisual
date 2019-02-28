@@ -28,14 +28,11 @@
 #include "auxFunc.h"
 
 namespace SV_Aux {
-
     /// Таймер задержки однопоточный
     class TimerDelay {
 
     public:
-
         TimerDelay() {
-
             prevCycTm = CurrDateTimeSinceEpochMs();
             cycleTm = 0;
 
@@ -44,7 +41,6 @@ namespace SV_Aux {
 
         // обновить тек время цикла
         void UpdateCycTime() {
-
             uint64_t ct = CurrDateTimeSinceEpochMs();
             cycleTm = ct - prevCycTm;
             prevCycTm = ct;
@@ -52,7 +48,6 @@ namespace SV_Aux {
             // посмотрим, использовались ли таймеры в пред цикле
             // если нет, обнуляем таймеры
             for (int i = 0; i < tmSz; ++i) {
-
                 if (!tmrs[i].tmActiv) tmrs[i].tmCnt = 0;
 
                 // сброс активности таймера для след цикла
@@ -68,17 +63,15 @@ namespace SV_Aux {
             prevTm = *lct;
         }
 
-        uint64_t GetCTime(){
-
+        uint64_t GetCTime() {
             return CurrDateTimeSinceEpochMs() - prevCycTm;
         }
 
         // таймер ondelay сек
         bool OnDelTmSec(bool start, int delay, int id) {
-
             bool res = false;
 
-            if (id >= tmSz){
+            if (id >= tmSz) {
                 tmrs.resize(id + 1, TmBase{0, false});
                 tmSz = id + 1;
             }
@@ -87,7 +80,8 @@ namespace SV_Aux {
                 tmrs[id].tmCnt += cycleTm;
 
                 if (tmrs[id].tmCnt >= delay * 1000) res = true;
-            } else tmrs[id].tmCnt = 0;
+            } else
+                tmrs[id].tmCnt = 0;
 
             // таймер активен в тек цикле
             tmrs[id].tmActiv = true;
@@ -97,17 +91,15 @@ namespace SV_Aux {
 
         // таймер offdelay сек
         bool OffDelTmSec(bool start, int delay, int id) {
-
             bool res = false;
 
-            if (id >= tmSz){
+            if (id >= tmSz) {
                 tmrs.resize(id + 1, TmBase{0, false});
                 tmSz = id + 1;
             }
 
             if (start) tmrs[id].tmCnt = delay * 1000;
             else {
-
                 if (tmrs[id].tmCnt > 0) {
                     res = true;
                     tmrs[id].tmCnt -= cycleTm;
@@ -122,10 +114,9 @@ namespace SV_Aux {
 
         // таймер ondelay мс
         bool OnDelTmMS(bool start, int delay, int id) {
-
             bool res = false;
 
-            if (id >= tmSz){
+            if (id >= tmSz) {
                 tmrs.resize(id + 1, TmBase{0, false});
                 tmSz = id + 1;
             }
@@ -144,17 +135,15 @@ namespace SV_Aux {
 
         // таймер offdelay мс
         bool OffDelTmMS(bool start, int delay, int id) {
-
             bool res = false;
 
-            if (id >= tmSz){
+            if (id >= tmSz) {
                 tmrs.resize(id + 1, TmBase{0, false});
                 tmSz = id + 1;
             }
 
             if (start) tmrs[id].tmCnt = delay;
             else {
-
                 if (tmrs[id].tmCnt > 0) {
                     res = true;
                     tmrs[id].tmCnt -= cycleTm;
@@ -169,25 +158,20 @@ namespace SV_Aux {
 
         // секундный импульс
         bool SecOnc() {
-
             return secOnc_;
         }
 
         // минутный импульс
         bool MinOnc() {
-
             return minOnc_;
-
         }
 
         // часовой импульс
         bool HourOnc() {
-
             return hourOnc_;
         }
 
     private:
-
         struct TmBase{
             uint64_t tmCnt;						// счетчик времени
             bool tmActiv;						// таймер был активен в тек цикле

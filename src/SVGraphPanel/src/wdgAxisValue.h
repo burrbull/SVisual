@@ -28,52 +28,52 @@
 
 class wdgAxisValue : public QWidget
 {
-	Q_OBJECT
+    Q_OBJECT
 private:
 
-	int cng_dashHeight_ = 3;
+    int cng_dashHeight_ = 3;
 
-	int curDashStep_ = 100;
-	int cng_maxDashStep_ = 200;
-	int cng_minDashStep_ = 100;
-	int curOffsPos_ = 0;
-	int curInterv_ = 0;
+    int curDashStep_ = 100;
+    int cng_maxDashStep_ = 200;
+    int cng_minDashStep_ = 100;
+    int curOffsPos_ = 0;
+    int curInterv_ = 0;
 
-	std::pair<double, double> valInterval_;
+    std::pair<double, double> valInterval_;
 
-	double scale_ = 1.0;
+    double scale_ = 1.0;
 
-	int mousePrevPosY_ = 0;
+    int mousePrevPosY_ = 0;
 
-	
-	void resizeEvent(QResizeEvent * event);
+    
+    void resizeEvent(QResizeEvent * event);
 
-	void drawDashLines(QPainter& painter);
-	void drawValMark(QPainter& painter);
+    void drawDashLines(QPainter& painter);
+    void drawValMark(QPainter& painter);
 
-	QString getValMark(int offs);
+    QString getValMark(int offs);
 
 
 public:
-	wdgAxisValue(QWidget *parent = 0);
-	~wdgAxisValue();
+    wdgAxisValue(QWidget *parent = 0);
+    ~wdgAxisValue();
 
-	void setValInterval(double min, double max);
+    void setValInterval(double min, double max);
 
-	std::pair<double, double> getValInterval();
+    std::pair<double, double> getValInterval();
 
-	double getValScale();
+    double getValScale();
 
-	std::vector<int> getAxisMark();
+    std::vector<int> getAxisMark();
 
-	void mouseMoveEvent(QMouseEvent * event);
-	void mousePressEvent(QMouseEvent * event);
-	void wheelEvent(QWheelEvent * event);
-	void scale(int delta);
+    void mouseMoveEvent(QMouseEvent * event);
+    void mousePressEvent(QMouseEvent * event);
+    void wheelEvent(QWheelEvent * event);
+    void scale(int delta);
 
 protected:
-	void paintEvent(QPaintEvent *event) Q_DECL_OVERRIDE;
+    void paintEvent(QPaintEvent *event) Q_DECL_OVERRIDE;
 
 signals:
-	void req_axisChange();
+    void req_axisChange();
 };

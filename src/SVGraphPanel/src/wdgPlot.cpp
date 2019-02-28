@@ -27,167 +27,141 @@
 #include "wdgAxisTime.h"
 #include "wdgAxisValue.h"
 
-wdgPlot::wdgPlot(QWidget *parent){
+wdgPlot::wdgPlot(QWidget *parent) {
+    setParent(parent);
 
-	setParent(parent);
-
-	QPalette p(palette());
-	p.setColor(QPalette::Background, Qt::white);
-	this->setAutoFillBackground(true);
-	this->setPalette(p);
-	this->setFocusPolicy(Qt::FocusPolicy::ClickFocus);
+    QPalette p(palette());
+    p.setColor(QPalette::Background, Qt::white);
+    this->setAutoFillBackground(true);
+    this->setPalette(p);
+    this->setFocusPolicy(Qt::FocusPolicy::ClickFocus);
 }
 
-void wdgPlot::mousePressEvent(QMouseEvent *event){
+void wdgPlot::mousePressEvent(QMouseEvent *event) {
+    presPnt_ = event->pos();
 
+    if (event->button() == Qt::LeftButton) {
+        lpm_ = true;
 
-	presPnt_ = event->pos();	
-	
-	if (event->button() == Qt::LeftButton) {
-		lpm_ = true;
-		
-		if (!tmrMarkerPos_){
-			tmrMarkerPos_ = new QTimer(this);
-			connect(tmrMarkerPos_, &QTimer::timeout, [=]() {
+        if (!tmrMarkerPos_) {
+            tmrMarkerPos_ = new QTimer(this);
+            connect(tmrMarkerPos_, &QTimer::timeout, [=]() {
                                 
-				if (lpm_) {
-					keyCntr_ = true;
-					emit req_updMarker();
-				}
+                if (lpm_) {
+                    keyCntr_ = true;
+                    emit req_updMarker();
+                }
 
-				tmrMarkerPos_->stop();
-				tmrMarkerPos_->deleteLater();
-				tmrMarkerPos_ = NULL;
-			});
+                tmrMarkerPos_->stop();
+                tmrMarkerPos_->deleteLater();
+                tmrMarkerPos_ = NULL;
+            });
             
-			tmrMarkerPos_->setInterval(1000);
-			tmrMarkerPos_->start();
-		}
-	}	
-	else if ((event->button() == Qt::RightButton) && axisTime_ && axisValue_) {
+            tmrMarkerPos_->setInterval(1000);
+            tmrMarkerPos_->start();
+        }
+    } else if ((event->button() == Qt::RightButton) && axisTime_ && axisValue_) {
+        rpm_ = true;
 
-		rpm_ = true;
+        this->setCursor(Qt::ClosedHandCursor);
 
-		this->setCursor(Qt::ClosedHandCursor);
-		
-		axisTime_->mousePressEvent(event);
-		axisValue_->mousePressEvent(event);
-	}
+        axisTime_->mousePressEvent(event);
+        axisValue_->mousePressEvent(event);
+    }
 
-
-	QWidget::mousePressEvent(event);
+    QWidget::mousePressEvent(event);
 }
 
-void wdgPlot::mouseReleaseEvent(QMouseEvent *event){
+void wdgPlot::mouseReleaseEvent(QMouseEvent *event) {
+    if (event->button() == Qt::LeftButton) {
+        lpm_ = false;
 
-	if (event->button() == Qt::LeftButton) {
-		
-		lpm_ = false;
+        if (!keyCntr_) emit req_rctChange();
 
+        keyCntr_ = false;
+    } else if (event->button() == Qt::RightButton) {
+        rpm_ = false;
 
-		if (!keyCntr_) emit req_rctChange();
+        this->setCursor(Qt::ArrowCursor);
 
-		keyCntr_ = false;
-	}
-	else if (event->button() == Qt::RightButton){
-		
-		rpm_ = false;
+        emit req_moveChange();
+    }
 
-		this->setCursor(Qt::ArrowCursor);
-
-		emit req_moveChange();				
-	}
-			
-	QWidget::mouseReleaseEvent(event);
+    QWidget::mouseReleaseEvent(event);
 }
 
-void wdgPlot::mouseMoveEvent(QMouseEvent *event){
+void wdgPlot::mouseMoveEvent(QMouseEvent *event) {
+    int dist = (event->pos() - presPnt_).manhattanLength();
+    if (dist < QApplication::startDragDistance()) return;
 
-	int dist = (event->pos() - presPnt_).manhattanLength();
-	if (dist < QApplication::startDragDistance()) return;
+    if (tmrMarkerPos_) {
+        tmrMarkerPos_->stop();
+        tmrMarkerPos_->deleteLater();
+        tmrMarkerPos_ = NULL;
+    }
 
-	if (tmrMarkerPos_){
-		tmrMarkerPos_->stop();
-		tmrMarkerPos_->deleteLater();
-		tmrMarkerPos_ = NULL;
-	}
-	
-	if (lpm_ && keyCntr_){
+    if (lpm_ && keyCntr_) {
+        emit req_updMarker();
+    } else if (lpm_) {
+        int w = event->pos().x() - presPnt_.x();
+        int h = event->pos().y() - presPnt_.y();
 
-		emit req_updMarker();
+        if ((w > 0) && (h > 0))
+            SelRect = QRect(presPnt_.x(), presPnt_.y(), w, h);
+        else if ((w < 0) && (h > 0))
+            SelRect = QRect(event->pos().x(), presPnt_.y(), abs(w), h);
+        else if ((w > 0) && (h < 0))
+            SelRect = QRect(presPnt_.x(), event->pos().y(), w, abs(h));
+        else if ((w < 0) && (h < 0))
+            SelRect = QRect(event->pos().x(), event->pos().y(), abs(w), abs(h));
 
-	}
-	else if (lpm_) {
-		int w = event->pos().x() - presPnt_.x();
-		int h = event->pos().y() - presPnt_.y();
+        update();
+    } else if (rpm_ && axisTime_ && axisValue_) {
+        axisTime_->mouseMoveEvent(event);
+        axisValue_->mouseMoveEvent(event);
+    }
 
-		if ((w > 0) && (h > 0))
-			SelRect = QRect(presPnt_.x(), presPnt_.y(), w, h);
-		else if ((w < 0) && (h > 0))
-			SelRect = QRect(event->pos().x(), presPnt_.y(), abs(w), h);
-		else if ((w > 0) && (h < 0))
-			SelRect = QRect(presPnt_.x(), event->pos().y(), w, abs(h));
-		else if ((w < 0) && (h < 0))
-			SelRect = QRect(event->pos().x(), event->pos().y(), abs(w), abs(h));
-
-		update();
-	}
-	else if (rpm_ && axisTime_ && axisValue_){
-		
-		axisTime_->mouseMoveEvent(event);
-		axisValue_->mouseMoveEvent(event);
-	}
-
-	QWidget::mouseMoveEvent(event);
+    QWidget::mouseMoveEvent(event);
 }
 
-void wdgPlot::wheelEvent(QWheelEvent * event){
-	auto keys = event->modifiers();
-
-	if (axisTime_ && axisValue_){
-
-		if (keys.testFlag(Qt::ControlModifier)) {
-			axisValue_->wheelEvent(event);
-		} else if (keys.testFlag(Qt::ShiftModifier)) {
-			axisTime_->wheelEvent(event);
-		} else {
-			axisTime_->wheelEvent(event);
-			axisValue_->wheelEvent(event);
-		}
-	}
+void wdgPlot::wheelEvent(QWheelEvent * event) {
+    auto keys = event->modifiers();
+    if (axisTime_ && axisValue_) {
+        if (keys.testFlag(Qt::ControlModifier)) {
+            axisValue_->wheelEvent(event);
+        } else if (keys.testFlag(Qt::ShiftModifier)) {
+            axisTime_->wheelEvent(event);
+        } else {
+            axisTime_->wheelEvent(event);
+            axisValue_->wheelEvent(event);
+        }
+    }
 }
 
-void wdgPlot::scale(int delta){
-	
-	if (axisTime_ && axisValue_){
-
-		axisTime_->scale(delta);
-		axisValue_->scale(delta);
-	}
+void wdgPlot::scale(int delta) {
+    if (axisTime_ && axisValue_) {
+        axisTime_->scale(delta);
+        axisValue_->scale(delta);
+    }
 }
 
-void wdgPlot::setAxisTime(wdgAxisTime* ax){
-
-	axisTime_ = ax;
-
+void wdgPlot::setAxisTime(wdgAxisTime* ax) {
+    axisTime_ = ax;
 }
 
-void wdgPlot::setAxisValue(wdgAxisValue* ax){
-
-	axisValue_ = ax;
-
+void wdgPlot::setAxisValue(wdgAxisValue* ax) {
+    axisValue_ = ax;
 }
 
-void wdgPlot::paintEvent(QPaintEvent *event){
+void wdgPlot::paintEvent(QPaintEvent *event) {
+    QPainter painter(this);
 
-	QPainter painter(this);
+    QPen pn(Qt::green, Qt::DashLine);    pn.setWidth(2); 
+    painter.setPen(pn);
 
-	QPen pn(Qt::green, Qt::DashLine);	pn.setWidth(2); 
-	painter.setPen(pn);
+    painter.drawRect(SelRect);
 
-	painter.drawRect(SelRect);
-	
-	QWidget::paintEvent(event);
+    QWidget::paintEvent(event);
 }
 
 

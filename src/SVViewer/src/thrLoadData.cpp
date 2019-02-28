@@ -32,24 +32,22 @@ extern MainWin* mainWin;
 
 using namespace SV_Cng;
 
-thrLoadData::thrLoadData(QStringList files){
+thrLoadData::thrLoadData(QStringList files) {
+    QThread* thr = new QThread(this);
 
-	QThread* thr = new QThread(this);
-		
-	this->moveToThread(thr);
-	connect(thr, &QThread::started, [this, files](){
+    this->moveToThread(thr);
+    connect(thr, &QThread::started, [this, files]() {
         bool ok = mainWin->loadData(files);
         emit finished(ok);
-	});
-	connect(this, &thrLoadData::finished, [this, thr](){
-		thr->quit();
-	});
+    });
+    connect(this, &thrLoadData::finished, [this, thr]() {
+        thr->quit();
+    });
 
-	thr->start();
+    thr->start();
 }
 
-bool uncompressData(char* inArr, size_t& cPos, size_t& outDataSz, char** outArr){
-
+bool uncompressData(char* inArr, size_t& cPos, size_t& outDataSz, char** outArr) {
     int sInt = sizeof(int);
 
     int comprSz = *(int*)(inArr + cPos);
@@ -65,8 +63,7 @@ bool uncompressData(char* inArr, size_t& cPos, size_t& outDataSz, char** outArr)
     return ret == 0;
 }
 
-bool MainWin::loadModuleVals(QString path){
-
+bool MainWin::loadModuleVals(QString path) {
     if (mainWin->fileRef_.contains(path)) return true;
 
     int utcOffs = path.lastIndexOf("UTC");
@@ -97,15 +94,13 @@ bool MainWin::loadModuleVals(QString path){
 
     char* outArr; size_t cFilePos = 0, dataSz = 0, patchNum = 0;
     int valSz = sizeof(uint64_t) + sizeof(value) * SV_PACKETSZ, vdataSz = sizeof(valueData);
-    while ((cFilePos < fsz) && uncompressData(inArr, cFilePos, dataSz, &outArr)){
-
+    while ((cFilePos < fsz) && uncompressData(inArr, cFilePos, dataSz, &outArr)) {
         ////
 
         int cPos = 0, szVl = 0;
 
         size_t itData = 0;
-        while (itData < dataSz){
-
+        while (itData < dataSz) {
             valueData* vr = (valueData*)(outArr + itData);
 
             QString sign = QString(vr->name) + vr->module;
@@ -116,9 +111,8 @@ bool MainWin::loadModuleVals(QString path){
             fileRef_[path]->signls[sign].patchApos.push_back(std::pair<int, int>(patchNum, cPos));
             fileRef_[path]->signls[sign].vlsCnt += vr->vlCnt;
 
-            if (signalRef_.contains(sign)){
-
-                if (!signalRef_[sign]->isActive){
+            if (signalRef_.contains(sign)) {
+                if (!signalRef_[sign]->isActive) {
                     signalRef_[sign]->isActive = true;
                     moduleRef_[vr->module]->isActive = true;
                     groupRef_[signalRef_[sign]->group.c_str()]->isActive = true;
@@ -143,11 +137,11 @@ bool MainWin::loadModuleVals(QString path){
 
             moduleRef_[vr->module]->signls.push_back(sign.toStdString());
 
-            if (!groupRef_.contains(vr->group)){
+            if (!groupRef_.contains(vr->group)) {
                 groupRef_.insert(vr->group, new groupData(vr->group));
                 groupRef_[vr->group]->isActive = true;
             }
-			groupRef_[vr->group]->signls.push_back(sign.toStdString());
+            groupRef_[vr->group]->signls.push_back(sign.toStdString());
 
             auto sd = new signalData();
             sd->name = vr->name;
@@ -157,7 +151,7 @@ bool MainWin::loadModuleVals(QString path){
             sd->type = vr->type;
             sd->isActive = true;
 
-			signalRef_[sign] = sd;
+            signalRef_[sign] = sd;
 
             szVl = vdataSz + vr->vlCnt * valSz;
             itData += szVl;
@@ -173,8 +167,7 @@ bool MainWin::loadModuleVals(QString path){
     return true;
 }
 
-bool loadSignalData(const QString& sign){
-
+bool loadSignalData(const QString& sign) {
     bool ok = true;
 
     MainWin::config& cng = mainWin->cng;
@@ -182,13 +175,13 @@ bool loadSignalData(const QString& sign){
     auto sdata = mainWin->signalRef_[sign];
 
     bool isNewFile = false;
-    for (auto path : mainWin->fileRef_){
-
-        if (!path->signls.contains(sign) || path->signls[sign].isLoad) continue;
+    for (auto path : mainWin->fileRef_) {
+        if (!path->signls.contains(sign) || path->signls[sign].isLoad)
+            continue;
 
         QFile file(path->file);
 
-        if (!file.exists() || !file.open(QIODevice::ReadOnly)){
+        if (!file.exists() || !file.open(QIODevice::ReadOnly)) {
             ok = false;
             continue;
         }
@@ -215,21 +208,23 @@ bool loadSignalData(const QString& sign){
 
         char* outArr; size_t cFilePos = 0, dataSz = 0;
         int psz = path->signls[sign].patchApos.size(), posMem = 0, patchNum = 0, vdSz =  sizeof(valueData);
-        while ((cFilePos < fsz) && uncompressData(inArr, cFilePos, dataSz, &outArr)){
-
-            for (int i = posMem; i < psz; ++i){
-
-                if (path->signls[sign].patchApos[i].first != patchNum){ posMem = i; break; }
+        while ((cFilePos < fsz) && uncompressData(inArr, cFilePos, dataSz, &outArr)) {
+            for (int i = posMem; i < psz; ++i) {
+                if (path->signls[sign].patchApos[i].first != patchNum) {
+                    posMem = i;
+                    break;
+                }
 
                 int offs = path->signls[sign].patchApos[i].second;
 
-                if (offs > dataSz) break;
+                if (offs > dataSz)
+                    break;
 
                 int vlCnt = ((valueData*)(outArr + offs))->vlCnt,
                         tmSz = sizeof(uint64_t), rdSz = tmSz + vlSz;
 
                 offs += vdSz;
-                for (int j = 0; j < vlCnt; ++j){
+                for (int j = 0; j < vlCnt; ++j) {
                     sdata->buffData[csz + j].beginTime = *(uint64_t*)(outArr + offs + j * rdSz) + path->utcOffsMs;
                     memcpy(sdata->buffData[csz + j].vals, outArr + offs + j * rdSz + tmSz, vlSz);
                 }
@@ -256,23 +251,23 @@ bool loadSignalData(const QString& sign){
 
     double minValue = INT32_MAX, maxValue = -INT32_MAX;
 
-    if (sdata->type == valueType::tInt){
-        for (auto& val : sdata->buffData){
-
-            for (int i = 0; i < SV_PACKETSZ; ++i){
-
-                if (val.vals[i].tInt > maxValue) maxValue = val.vals[i].tInt;
-                if (val.vals[i].tInt < minValue) minValue = val.vals[i].tInt;
+    if (sdata->type == valueType::tInt) {
+        for (auto& val : sdata->buffData) {
+            for (int i = 0; i < SV_PACKETSZ; ++i) {
+                if (val.vals[i].tInt > maxValue)
+                    maxValue = val.vals[i].tInt;
+                if (val.vals[i].tInt < minValue)
+                    minValue = val.vals[i].tInt;
             }
         }
     }
-    else if (sdata->type == valueType::tFloat){
-        for (auto& val : sdata->buffData){
-
-            for (int i = 0; i < SV_PACKETSZ; ++i){
-
-                if (val.vals[i].tFloat > maxValue) maxValue = val.vals[i].tFloat;
-                if (val.vals[i].tFloat < minValue) minValue = val.vals[i].tFloat;
+    else if (sdata->type == valueType::tFloat) {
+        for (auto& val : sdata->buffData) {
+            for (int i = 0; i < SV_PACKETSZ; ++i) {
+                if (val.vals[i].tFloat > maxValue)
+                    maxValue = val.vals[i].tFloat;
+                if (val.vals[i].tFloat < minValue)
+                    minValue = val.vals[i].tFloat;
             }
         }
     }
@@ -285,8 +280,7 @@ bool loadSignalData(const QString& sign){
     return ok;
 }
 
-bool MainWin::loadData(QStringList files){
-
+bool MainWin::loadData(QStringList files) {
     cng.selOpenDir = files[0].left(files[0].lastIndexOf('/'));
 
     bool ok = false;

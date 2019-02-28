@@ -27,53 +27,53 @@
 #include "SVClient/SVClient.h"
 #include "SVAuxFunc/auxFunc.h"
 
-int main(int argc, char *argv[]){
+int main(int argc, char *argv[]) {
+    int diap = 9;
+    double vl = 134.6656;
 
-    int diap = 9; double vl = 134.6656;
+    if (diap > 100)
+        vl = int(vl + 0.5);
+    else if (diap > 10)
+        vl = int(vl * 10 + 0.5) / 10.;
+    else if (diap > 1)
+        vl = int(vl * 100 + 0.5) / 100.;
+    else
+        vl = int(vl * 1000 + 0.5) / 1000.;
 
-    if (diap > 100) vl = int(vl + 0.5);
-    else if (diap > 10) vl = int(vl * 10 + 0.5) / 10.;
-    else if (diap > 1) vl = int(vl * 100 + 0.5) / 100.;
-    else vl = int(vl * 1000 + 0.5) / 1000.;
+    std::string nm = argc >= 2 ? argv[1] : "client";
 
+    int cyc = argc >= 3 ? atoi(argv[2]) : 100;
+    int packSz = argc >= 4 ? atoi(argv[3]) : 10;
 
-	std::string nm = argc >= 2 ? argv[1] : "client";
+    SV_Cln::svSetParam(cyc, packSz);
 
-	int cyc = argc >= 3 ? atoi(argv[2]) : 100;
-	int packSz = argc >= 4 ? atoi(argv[3]) : 10;
+    if (SV_Cln::svConnect(nm.c_str(), "127.0.0.1", 2144)) {
+        std::cout << "connect " << nm.c_str() << " ok" << std::endl;
 
-	SV_Cln::svSetParam(cyc, packSz);
+        /*for (int i = 0; i < 100; ++i) {
 
-	if (SV_Cln::svConnect(nm.c_str(), "127.0.0.1", 2144)){
+            std::string val = "абрвал" + std::to_string(i);
+            SV_Cln::svAddIntValue(val.c_str(), 0);
 
-		std::cout << "connect " << nm.c_str() << " ok" << std::endl;
+            val = "front" + std::to_string(i);
+            SV_Cln::svAddBoolValue(val.c_str(), true);
+        }*/
+    } else
+        std::cout << "connect no" << std::endl;
 
-		/*for (int i = 0; i < 100; ++i){
+    int cp = 0;
+    while (true) {
+        for (int i = 0; i < 100; i++) {
+            std::string val = "dde" + std::to_string(i);
+            SV_Cln::svAddIntValue(val.c_str(), rand() % 10000);
 
-			std::string val = "абрвал" + std::to_string(i);
-			SV_Cln::svAddIntValue(val.c_str(), 0);
+            val = "front" + std::to_string(i);
+            SV_Cln::svAddBoolValue(val.c_str(), cp%2);
+        }
 
-			val = "front" + std::to_string(i);
-			SV_Cln::svAddBoolValue(val.c_str(), true);
-		}*/
-	}
-	else std::cout << "connect no" << std::endl;
+        cp += 1; if (cp > 100) cp = -100;
 
-	int cp = 0;
-	while (true){
-
-		for (int i = 0; i < 100; i++){
-				
-			std::string val = "dde" + std::to_string(i);
-			SV_Cln::svAddIntValue(val.c_str(), rand() % 10000);
-
-			val = "front" + std::to_string(i);
-			SV_Cln::svAddBoolValue(val.c_str(), cp%2);
-		}
-		
-		cp += 1; if (cp > 100) cp = -100;
-			
-		SV_Aux::SleepMs(cyc);
-	}
-	return 0;
+        SV_Aux::SleepMs(cyc);
+    }
+    return 0;
 }

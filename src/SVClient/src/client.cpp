@@ -31,106 +31,98 @@
 
 using namespace std;
 
-client::~client(){
+client::~client() {
+    if (isConnect_) SV_TcpCln::disconnect();
 
-	if (isConnect_) SV_TcpCln::disconnect();
-
-	thrStop_ = true;
-	if (thr_.joinable()) thr_.join();
+    thrStop_ = true;
+    if (thr_.joinable()) thr_.join();
 }
 
-void client::setConfig(config cng_){
-
-	cng = cng_;
+void client::setConfig(config cng_) {
+    cng = cng_;
 }
 
-bool client::connect(const char* moduleName, const char* ipAddr, int port){
+bool client::connect(const char* moduleName, const char* ipAddr, int port) {
+    std::unique_lock<std::mutex> lck(mtxConnect_);
 
-	std::unique_lock<std::mutex> lck(mtxConnect_);
+    if (isConnect_)
+        return true;
 
-	if (isConnect_) return true;
+    if ((strlen(moduleName) == 0) || (strlen(moduleName) >= SV_NAMESZ)) {
+        return false;
+    }
 
-	if ((strlen(moduleName) == 0) || (strlen(moduleName) >= SV_NAMESZ)){
-		return false;
-	}
+    if (strstr(moduleName, "=end=") || strstr(moduleName, "=begin=")) {
+        return false;
+    }
 
-	if (strstr(moduleName, "=end=") || strstr(moduleName, "=begin=")){
-		return false;
-	}
+    module_ = moduleName;
+    addrServ_ = ipAddr;
+    portServ_ = port;
 
-	module_ = moduleName;
-	addrServ_ = ipAddr;
-	portServ_ = port;
+    isConnect_ = SV_TcpCln::connect(ipAddr, port);
 
-	isConnect_ = SV_TcpCln::connect(ipAddr, port);
-
-	if (isConnect_){
+    if (isConnect_) {
         thr_ = std::thread([](client *lp) { lp->sendCyc(); }, this);
-	}
+    }
 
-	return isConnect_;
+    return isConnect_;
 }
 
-void client::disconnect(){
+void client::disconnect() {
+    if (isConnect_) SV_TcpCln::disconnect();
 
-	if (isConnect_) SV_TcpCln::disconnect();
+    thrStop_ = true;
 
-	thrStop_ = true;
-
-	if (thr_.joinable()) thr_.join();
+    if (thr_.joinable()) thr_.join();
 }
 
-bool client::addValue(const char* name, SV_Cng::valueType type, SV_Cng::value val, bool onlyPosFront){
+bool client::addValue(const char* name, SV_Cng::valueType type, SV_Cng::value val, bool onlyPosFront) {
+    if (!isConnect_) return false;
 
-	if (!isConnect_) return false;
+    bool ok = true;
 
-	bool ok = true;
+    if (values_.find(name) == values_.end()) {
+        if ((strlen(name) == 0) || (strlen(name) >= SV_NAMESZ)) {
+            return false;
+        }
 
-	if (values_.find(name) == values_.end()){
+        if (strstr(name, "=end=") || strstr(name, "=begin=")) {
+            return false;
+        }
+        valueRec* vd = new valueRec();
+        memset(vd, 0, sizeof(valueRec));
+        strcpy(vd->name, name);
+        vd->type = type;
+        vd->isOnlyFront = onlyPosFront;
+        mtxUpdValue_.lock();
+        values_.insert(pair<string, valueRec*>(name, vd));
+        values_[name]->vals = new SV_Cng::value[SV_PACKETSZ];
+        memset(values_[name]->vals, 0, sizeof(SV_Cng::value) * SV_PACKETSZ);
+        mtxUpdValue_.unlock();
+    }
+    
+    valueRec* vr = values_[name];
 
-		if ((strlen(name) == 0) || (strlen(name) >= SV_NAMESZ)){
-			return false;
-		}
+    if (!isWrite_) {
+        vr->vals[curCycCnt_] = val;
+        vr->isActive = true;
+    } else {
+        mtxUpdValue_.lock();
 
-		if (strstr(name, "=end=") || strstr(name, "=begin=")){
-			return false;
-		}
-		valueRec* vd = new valueRec();
-		memset(vd, 0, sizeof(valueRec));
-		strcpy(vd->name, name);
-		vd->type = type;
-		vd->isOnlyFront = onlyPosFront;
-		mtxUpdValue_.lock();
-		values_.insert(pair<string, valueRec*>(name, vd));
-		values_[name]->vals = new SV_Cng::value[SV_PACKETSZ];
-		memset(values_[name]->vals, 0, sizeof(SV_Cng::value) * SV_PACKETSZ);
-		mtxUpdValue_.unlock();
-	}
-	
-	valueRec* vr = values_[name];
-	
-	if (!isWrite_){
+        vr->vals[curCycCnt_] = val;
+        vr->isActive = true;
 
-		vr->vals[curCycCnt_] = val;
-		vr->isActive = true;
-	}
-	else {
-		mtxUpdValue_.lock();
+        mtxUpdValue_.unlock();
+    }
 
-		vr->vals[curCycCnt_] = val;
-		vr->isActive = true;
-
-		mtxUpdValue_.unlock();
-	}
-	
-	return ok;
+    return ok;
 }
 
-bool client::sendData(){
+bool client::sendData() {
+    if (values_.empty()) return true;
 
-	if (values_.empty()) return true;
-
-	size_t SINT = sizeof(int), vlSz = SV_NAMESZ + SINT + SINT * SV_PACKETSZ,
+    size_t SINT = sizeof(int), vlSz = SV_NAMESZ + SINT + SINT * SV_PACKETSZ,
            dataSz = SV_NAMESZ + vlSz * values_.size(),
            startSz = 7, endSz = 5,
            arrSz = startSz + SINT + dataSz + endSz,
@@ -139,77 +131,74 @@ bool client::sendData(){
     char* arr = new char[arrSz];
     memset(arr, 0, arrSz);
 
-	memcpy(arr, "=begin=", startSz); offs += startSz;
+    memcpy(arr, "=begin=", startSz); offs += startSz;
 
-	memcpy(arr + offs, &dataSz, SINT); offs += SINT;
+    memcpy(arr + offs, &dataSz, SINT); offs += SINT;
 
-	memcpy(arr + offs, module_.data(), SV_NAMESZ); offs += SV_NAMESZ;
+    memcpy(arr + offs, module_.data(), SV_NAMESZ); offs += SV_NAMESZ;
 
-	int cnt = 0;
-	for (auto& it : values_) {
+    int cnt = 0;
+    for (auto& it : values_) {
+        memcpy(arr + offs + vlSz*cnt, it.second->name, SV_NAMESZ);
+        memcpy(arr + offs + vlSz*cnt + SV_NAMESZ, &it.second->type, SINT);
+        memcpy(arr + offs + vlSz*cnt + SV_NAMESZ + SINT, it.second->vals, SV_PACKETSZ * SINT);
 
-		memcpy(arr + offs + vlSz*cnt, it.second->name, SV_NAMESZ);
-		memcpy(arr + offs + vlSz*cnt + SV_NAMESZ, &it.second->type, SINT);
-		memcpy(arr + offs + vlSz*cnt + SV_NAMESZ + SINT, it.second->vals, SV_PACKETSZ * SINT);
+        ++cnt;
+    }
 
-		++cnt;
-	}
-
-	memcpy(arr + offs + vlSz*cnt, "=end=", endSz);
+    memcpy(arr + offs + vlSz*cnt, "=end=", endSz);
 
     string out;
-	bool ok = SV_TcpCln::sendData(string(arr, arrSz), out, false, true);
+    bool ok = SV_TcpCln::sendData(string(arr, arrSz), out, false, true);
 
-	delete[] arr;
+    delete[] arr;
 
-	return ok;
+    return ok;
 
 }
 
-void client::sendCyc(){
+void client::sendCyc() {
+    uint64_t cTm = SV_Aux::CurrDateTimeSinceEpochMs(), prevTm = cTm, tmDiff = SV_CYCLEREC_MS;
 
-	uint64_t cTm = SV_Aux::CurrDateTimeSinceEpochMs(), prevTm = cTm, tmDiff = SV_CYCLEREC_MS;
+    while (!thrStop_ ) {
+        if (!isConnect_)
+            isConnect_ = SV_TcpCln::connect(addrServ_, portServ_);
 
-	while (!thrStop_ ){
+        cTm = SV_Aux::CurrDateTimeSinceEpochMs();
+        tmDiff = cTm - prevTm - (SV_CYCLEREC_MS - tmDiff); prevTm = cTm;
 
-		if (!isConnect_)
-			isConnect_ = SV_TcpCln::connect(addrServ_, portServ_);
+        mtxUpdValue_.lock();
+        isWrite_ = true;
 
-		cTm = SV_Aux::CurrDateTimeSinceEpochMs();
-		tmDiff = cTm - prevTm - (SV_CYCLEREC_MS - tmDiff); prevTm = cTm;
+        int prevCyc = curCycCnt_ - 1;
+        if (prevCyc < 0)
+            prevCyc = SV_PACKETSZ - 1;
+        for (auto& it : values_) {
+            if (!it.second->isActive) {
+                it.second->vals[curCycCnt_] = it.second->vals[prevCyc];
 
-		mtxUpdValue_.lock();
-		isWrite_ = true;
+                if ((it.second->type == SV_Cng::valueType::tBool) && it.second->isOnlyFront)
+                    it.second->vals[curCycCnt_].tBool = false;
+            }
 
-		int prevCyc = curCycCnt_ - 1; if (prevCyc < 0) prevCyc = SV_PACKETSZ - 1;
-		for (auto& it : values_) {
+            it.second->isActive = false;
+        }
 
-			if (!it.second->isActive) {
-				it.second->vals[curCycCnt_] = it.second->vals[prevCyc];
+        int next = curCycCnt_ + 1;
 
-				if ((it.second->type == SV_Cng::valueType::tBool) && it.second->isOnlyFront)
-					it.second->vals[curCycCnt_].tBool = false;
-			}
+        if (next >= SV_PACKETSZ) {
+            isConnect_ = (isConnect_) ? sendData() : false;
 
-			it.second->isActive = false;
-		}
+            curCycCnt_ = 0;
+        } else
+            ++curCycCnt_;
 
-		int next = curCycCnt_ + 1;
-		
-		if (next >= SV_PACKETSZ) {
+        isWrite_ = false;
+        mtxUpdValue_.unlock();
 
-			isConnect_ = (isConnect_) ? sendData() : false;
-
-			curCycCnt_ = 0;
-		}
-		else ++curCycCnt_;
-
-		isWrite_ = false;
-		mtxUpdValue_.unlock();
-
-		if ((SV_CYCLEREC_MS - tmDiff) > 0)
-			SV_Aux::SleepMs(SV_CYCLEREC_MS - tmDiff);
-	}
+        if ((SV_CYCLEREC_MS - tmDiff) > 0)
+            SV_Aux::SleepMs(SV_CYCLEREC_MS - tmDiff);
+    }
 }
 
 

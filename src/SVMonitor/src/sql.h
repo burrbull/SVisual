@@ -32,40 +32,38 @@
 class sql
 {
 private:
-	
-	sqlite3* db_;
+    sqlite3* db_;
 
-	QString pathDB_;
+    QString pathDB_;
 
-	QMutex mtx_;
-			
-	bool Init();
+    QMutex mtx_;
 
-	bool Open();
+    bool Init();
 
-	void Close();
+    bool Open();
 
-	bool Query(const std::string& query,
-		std::vector<std::vector<std::string>>& result);
-	
+    void Close();
+
+    bool Query(const std::string& query,
+        std::vector<std::vector<std::string>>& result);
+
 public:
-		
-	sql(QString path, bool& err);
+    sql(QString path, bool& err);
 
-	~sql();
-	
-	bool saveTriggers(const std::map<std::string, SV_Cng::triggerData*>& trg);
+    ~sql();
+    
+    bool saveTriggers(const std::map<std::string, SV_Cng::triggerData*>& trg);
 
-	std::vector<SV_Cng::triggerData*> getTrigger(const QString& signal, const QString& module);
-	SV_Cng::triggerData* getTrigger(const QString& trname);
-	void delTrigger(const QString& trname);
-	
-	bool saveSignals(const std::map<std::string, SV_Cng::signalData*>& signs);
-	SV_Cng::signalData getSignal(const QString& signal, const QString& module);
+    std::vector<SV_Cng::triggerData*> getTrigger(const QString& signal, const QString& module);
+    SV_Cng::triggerData* getTrigger(const QString& trname);
+    void delTrigger(const QString& trname);
+    
+    bool saveSignals(const std::map<std::string, SV_Cng::signalData*>& signs);
+    SV_Cng::signalData getSignal(const QString& signal, const QString& module);
 
-	bool saveUserEventData(const QMap<QString, userEventData>&);
-	userEventData getUserEventData(QString name);
+    bool saveUserEventData(const QMap<QString, userEventData>&);
+    userEventData getUserEventData(QString name);
 
-	void saveEvent(QString trigger, QDateTime dt);
-	std::vector<uEvent> getEvents(QDateTime beginTime, QDateTime endTime);
+    void saveEvent(QString trigger, QDateTime dt);
+    std::vector<uEvent> getEvents(QDateTime beginTime, QDateTime endTime);
 };

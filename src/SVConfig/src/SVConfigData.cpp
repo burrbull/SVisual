@@ -27,16 +27,16 @@
 
 
 namespace SV_Cng {
-
     /// вернуть тип сигнала как значение
     /// \param str
     /// \return
     valueType getSVType(std::string str) {
-
         valueType res = valueType::tInt;
 
-        if (str == "bool") res = valueType::tBool;
-        else if (str == "float") res = valueType::tFloat;
+        if (str == "bool")
+            res = valueType::tBool;
+        else if (str == "float")
+            res = valueType::tFloat;
 
         return res;
     }
@@ -48,8 +48,10 @@ namespace SV_Cng {
 
         std::string res = "int";
 
-        if (type == valueType::tBool) res = "bool";
-        else if (type == valueType::tFloat) res = "float";
+        if (type == valueType::tBool)
+            res = "bool";
+        else if (type == valueType::tFloat)
+            res = "float";
 
         return res;
     }
@@ -59,7 +61,6 @@ namespace SV_Cng {
     /// \param value
     /// \return
     std::string getSValue(valueType vt, double value) {
-
         std::string res = "";
 
         switch (vt) {

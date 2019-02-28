@@ -39,7 +39,6 @@
 using namespace std;
 
 namespace SV_Aux {
-
     // тек дата %Y%m%d
     string CurrDateS() {
 
@@ -54,7 +53,6 @@ namespace SV_Aux {
 
     // тек дата-время %Y%m%d_%H%M
     string CurrDateTimeEx() {
-
         time_t ct = time(nullptr);
         tm* lct = localtime(&ct);
 
@@ -66,7 +64,6 @@ namespace SV_Aux {
 
     // тек дата-время %Y-%m-%d %H:%M:%S
     string CurrDateTime() {
-
         time_t ct = time(nullptr);
         tm* lct = localtime(&ct);
 
@@ -78,7 +75,6 @@ namespace SV_Aux {
 
     // тек дата-время %Y-%m-%d %H:%M:%S:%MS
     string CurrDateTimeMs() {
-
         time_t ct = time(nullptr);
         tm* lct = localtime(&ct);
 
@@ -96,7 +92,6 @@ namespace SV_Aux {
 
      // тек дата-время %Y-%m-%d %H:%M:%S
     std::string CurrDateTimeSQL() {
-
         time_t ct = time(nullptr);
         tm* lct = localtime(&ct);
 
@@ -107,16 +102,14 @@ namespace SV_Aux {
 
     }
 
-    uint64_t CurrDateTimeSinceEpochMs(){
-
+    uint64_t CurrDateTimeSinceEpochMs() {
         auto now = std::chrono::system_clock::now();
         auto now_ms = std::chrono::time_point_cast<std::chrono::milliseconds>(now);
 
-       return now_ms.time_since_epoch().count();
+        return now_ms.time_since_epoch().count();
     }
 
     int HourOffsFromUTC() {
-
         time_t rawtime = time(NULL);
         struct tm *ptm = gmtime(&rawtime);
         time_t gmt = mktime(ptm);
@@ -126,7 +119,6 @@ namespace SV_Aux {
     }
 
     vector<string> split(string str, const char *sep) {
-
         char *cstr = (char *) str.c_str();
 
         vector<string> res;
@@ -153,11 +145,12 @@ namespace SV_Aux {
         string strTmp = "";
         for (int i = 0; i < sz; ++i) {
             char ch = strDirs[i];
-            if (ch != '\\' && ch != '/') strTmp += ch;
+            if (ch != '\\' && ch != '/')
+                strTmp += ch;
             else {
 #if defined(_WIN32)
                 strTmp += "\\";
-				ret = CreateDirectoryA(strTmp.c_str(), NULL);
+                ret = CreateDirectoryA(strTmp.c_str(), NULL);
 #else
                 strTmp += "/";
                 ret = mkdir(strTmp.c_str(), 0733);
@@ -167,7 +160,7 @@ namespace SV_Aux {
         return ret == 0;
     }
 
-    void SleepMs(uint64_t ms){
+    void SleepMs(uint64_t ms) {
         std::this_thread::sleep_for(std::chrono::milliseconds(ms));
     }    
 }

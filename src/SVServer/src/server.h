@@ -34,19 +34,17 @@
 class thrUpdSignal;
 class thrUpdTrigger;
 
-class server{
-
-    public:
-
-	SV_Srv::statusCBack pfStatusCBack = nullptr;
-	SV_Srv::onUpdateSignalsCBack pfUpdateSignalsCBack = nullptr;
-	SV_Srv::onAddSignalsCBack pfAddSignalsCBack = nullptr;
-	SV_Srv::onTriggerCBack pfTriggerCBack = nullptr;
+class server
+{
+public:
+    SV_Srv::statusCBack pfStatusCBack = nullptr;
+    SV_Srv::onUpdateSignalsCBack pfUpdateSignalsCBack = nullptr;
+    SV_Srv::onAddSignalsCBack pfAddSignalsCBack = nullptr;
+    SV_Srv::onTriggerCBack pfTriggerCBack = nullptr;
     SV_Srv::onModuleConnectCBack pfModuleConnectCBack = nullptr;
     SV_Srv::onModuleDisconnectCBack pfModuleDisconnectCBack = nullptr;
 
     static const int BUFF_SIGN_HOUR_CNT = 2;  // жестко размер буфера, час
-
 
     /// старт сервера
     bool startServer(SV_Srv::config);
@@ -68,7 +66,6 @@ class server{
 
     // вернуть данные модуля
     SV_Cng::moduleData* getModuleData(const std::string& module);
-
 
     // вернуть все сигналы
     std::map<std::string, SV_Cng::signalData *> getCopySignalRef();
@@ -95,7 +92,6 @@ class server{
     bool delTrigger(const std::string& name);
 
 private:
-
     SV_Srv::config cng;
 
     bool isRun_ = false;

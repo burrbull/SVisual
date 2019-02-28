@@ -25,110 +25,108 @@
 #include "stdafx.h"
 #include "wdgAxisValue.h"
 
-wdgAxisValue::wdgAxisValue(QWidget *parent){
+wdgAxisValue::wdgAxisValue(QWidget *parent) {
+    setParent(parent);
 
-	setParent(parent);
+    valInterval_.first = 0;
+    valInterval_.second = 1000;
 
-	valInterval_.first = 0;
-	valInterval_.second = 1000;
-
-	scale_ = (valInterval_.second - valInterval_.first) / height();
-
+    scale_ = (valInterval_.second - valInterval_.first) / height();
 }
 
-wdgAxisValue::~wdgAxisValue(){}
-
-void wdgAxisValue::mouseMoveEvent(QMouseEvent * event){
-
-	int pos = event->pos().y(), diff = pos - mousePrevPosY_;
-
-	curOffsPos_ += diff;
-
-	if (curOffsPos_ > curDashStep_) curOffsPos_ = 0;
-	if (curOffsPos_ < 0) curOffsPos_ = curDashStep_;
-
-	valInterval_.first += scale_ * diff;
-	valInterval_.second += scale_ * diff;
-
-	curInterv_ = valInterval_.second - valInterval_.first;
-
-	mousePrevPosY_ = pos;
-
-	emit req_axisChange();
-
+wdgAxisValue::~wdgAxisValue() {
 }
 
-void wdgAxisValue::mousePressEvent(QMouseEvent * event){
+void wdgAxisValue::mouseMoveEvent(QMouseEvent * event) {
+    int pos = event->pos().y(), diff = pos - mousePrevPosY_;
 
-	mousePrevPosY_ = event->pos().y();
+    curOffsPos_ += diff;
+
+    if (curOffsPos_ > curDashStep_)
+        curOffsPos_ = 0;
+    if (curOffsPos_ < 0)
+        curOffsPos_ = curDashStep_;
+
+    valInterval_.first += scale_ * diff;
+    valInterval_.second += scale_ * diff;
+
+    curInterv_ = valInterval_.second - valInterval_.first;
+
+    mousePrevPosY_ = pos;
+
+    emit req_axisChange();
 }
 
-void wdgAxisValue::scale(int delta){
-		
-	if (delta > 0) curDashStep_++;
-	else curDashStep_--;
-
-	if (curDashStep_ > cng_maxDashStep_) curDashStep_ = cng_minDashStep_;
-	else if (curDashStep_ < cng_minDashStep_) curDashStep_ = cng_maxDashStep_;
-
-	int offs = 10;
-
-	if (curInterv_ > 1000) offs *= 10;
-	else if (curInterv_ > 10000) offs *= 100;
-	else if (curInterv_ < 100) offs /= 10;
-
-	if (delta > 0){ 
-		valInterval_.first += offs;
-		valInterval_.second -= offs;
-
-		if (valInterval_.first >= valInterval_.second) valInterval_.first = valInterval_.second - 0.1;
-	}
-	else{ 
-		valInterval_.first -= offs;
-		valInterval_.second += offs;
-	}
-
-	curInterv_ = valInterval_.second - valInterval_.first;
-
-	scale_ = (valInterval_.second - valInterval_.first) / height();
-
-	emit req_axisChange();
+void wdgAxisValue::mousePressEvent(QMouseEvent * event) {
+    mousePrevPosY_ = event->pos().y();
 }
 
-void wdgAxisValue::wheelEvent(QWheelEvent * event){
+void wdgAxisValue::scale(int delta) {
+    if (delta > 0)
+        curDashStep_++;
+    else
+        curDashStep_--;
 
-	scale(event->delta());
+    if (curDashStep_ > cng_maxDashStep_)
+        curDashStep_ = cng_minDashStep_;
+    else if (curDashStep_ < cng_minDashStep_)
+        curDashStep_ = cng_maxDashStep_;
 
+    int offs = 10;
+
+    if (curInterv_ > 1000)
+        offs *= 10;
+    else if (curInterv_ > 10000)
+        offs *= 100;
+    else if (curInterv_ < 100)
+        offs /= 10;
+
+    if (delta > 0) { 
+        valInterval_.first  += offs;
+        valInterval_.second -= offs;
+
+        if (valInterval_.first >= valInterval_.second)
+            valInterval_.first = valInterval_.second - 0.1;
+    } else { 
+        valInterval_.first  -= offs;
+        valInterval_.second += offs;
+    }
+
+    curInterv_ = valInterval_.second - valInterval_.first;
+
+    scale_ = (valInterval_.second - valInterval_.first) / height();
+
+    emit req_axisChange();
 }
 
-void wdgAxisValue::resizeEvent(QResizeEvent * event){
-
-	scale_ = (valInterval_.second - valInterval_.first) / height();
-
-	emit req_axisChange();
+void wdgAxisValue::wheelEvent(QWheelEvent * event) {
+    scale(event->delta());
 }
 
-void wdgAxisValue::drawDashLines(QPainter& painter){
-
-	int w = width(), h = height();
-
-	painter.setPen(Qt::gray);
-	painter.drawLine(QPoint(w-1, 0), QPoint(w-1, h));
-
-	painter.setPen(Qt::black);
-	int cHeight = curOffsPos_ % curDashStep_;
-
-	while (cHeight < h){
-
-		painter.drawLine(QPoint(w - cng_dashHeight_, cHeight), QPoint(w, cHeight));
-
-		cHeight += curDashStep_;
-	}
+void wdgAxisValue::resizeEvent(QResizeEvent * event) {
+    scale_ = (valInterval_.second - valInterval_.first) / height();
+    
+    emit req_axisChange();
 }
 
-QString wdgAxisValue::getValMark(int offs){
-		
-	double vl = valInterval_.second - scale_ * offs;
+void wdgAxisValue::drawDashLines(QPainter& painter) {
+    int w = width(), h = height();
+
+    painter.setPen(Qt::gray);
+    painter.drawLine(QPoint(w-1, 0), QPoint(w-1, h));
+
+    painter.setPen(Qt::black);
+    int cHeight = curOffsPos_ % curDashStep_;
+
+    while (cHeight < h) {
+        painter.drawLine(QPoint(w - cng_dashHeight_, cHeight), QPoint(w, cHeight));
+
+        cHeight += curDashStep_;
+    }
+}
+
+QString wdgAxisValue::getValMark(int offs) {
+    double vl = valInterval_.second - scale_ * offs;
 
     int sign = vl > 0 ? 1 : -1;
 
@@ -136,80 +134,71 @@ QString wdgAxisValue::getValMark(int offs){
 
     int diap = abs(valInterval_.second - valInterval_.first);
 
-    if (diap > 100) vl = int(vl + 0.5);
-    else if (diap > 10) vl = int(vl * 10 + 0.5) / 10.;
-    else if (diap > 1) vl = int(vl * 100 + 0.5) / 100.;
-    else vl = int(vl * 1000 + 0.5) / 1000.;
+    if (diap > 100)
+        vl = int(vl + 0.5);
+    else if (diap > 10)
+        vl = int(vl * 10 + 0.5) / 10.;
+    else if (diap > 1)
+        vl = int(vl * 100 + 0.5) / 100.;
+    else
+        vl = int(vl * 1000 + 0.5) / 1000.;
 
     return QString::number(vl * sign);
 }
 
-void wdgAxisValue::drawValMark(QPainter& painter){
+void wdgAxisValue::drawValMark(QPainter& painter) {
+    int w = width(), h = height();
 
-	int w = width(), h = height();
+    int cHeight = curOffsPos_ % curDashStep_;
 
-	int cHeight = curOffsPos_ % curDashStep_;
+    while (cHeight < h) {
+        QString valMark = getValMark(cHeight);
 
-	while (cHeight < h){
-
-		QString valMark = getValMark(cHeight);
-			
         int fontMetr = this->fontMetrics().width(valMark), 
             xp = std::max(0, w - fontMetr - 15);
 
         painter.drawText(QPoint(xp, cHeight), valMark);
-				
-		cHeight += curDashStep_;
-				
-	}
+
+        cHeight += curDashStep_;
+    }
 }
 
-void wdgAxisValue::paintEvent(QPaintEvent *event){
-
-	QPainter painter(this);
-
-	drawDashLines(painter);
-
-	drawValMark(painter);
-
+void wdgAxisValue::paintEvent(QPaintEvent *event) {
+    QPainter painter(this);
+    drawDashLines(painter);
+    drawValMark(painter);
 }
 
-void wdgAxisValue::setValInterval(double minv, double maxv){
-		
-	valInterval_.first = minv;
-	valInterval_.second = maxv;
+void wdgAxisValue::setValInterval(double minv, double maxv) {
+    valInterval_.first = minv;
+    valInterval_.second = maxv;
 
-	curInterv_ = valInterval_.second - valInterval_.first;
+    curInterv_ = valInterval_.second - valInterval_.first;
 
-	scale_ = (valInterval_.second - valInterval_.first) / height();
+    scale_ = (valInterval_.second - valInterval_.first) / height();
 }
 
-std::pair<double, double> wdgAxisValue::getValInterval(){
-
-	return valInterval_;
+std::pair<double, double> wdgAxisValue::getValInterval() {
+    return valInterval_;
 
 }
 
-double wdgAxisValue::getValScale(){
-
-	return scale_;
+double wdgAxisValue::getValScale() {
+    return scale_;
 }
 
-std::vector<int> wdgAxisValue::getAxisMark(){
+std::vector<int> wdgAxisValue::getAxisMark() {
+    std::vector<int> mark;
 
-	std::vector<int> mark;
+    int h = height();
 
-	int h = height();
+    int cHeight = curOffsPos_ % curDashStep_;
 
-	int cHeight = curOffsPos_ % curDashStep_;
+    while (cHeight < h) {
+        mark.push_back(cHeight);
+        cHeight += curDashStep_;
+    }
 
-	while (cHeight < h){
-
-		mark.push_back(cHeight);
-
-		cHeight += curDashStep_;
-	}
-
-	return mark;
+    return mark;
 
 }

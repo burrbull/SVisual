@@ -27,7 +27,6 @@
 #include <string>
 
 namespace SV_TcpSrv {
-
     /// запустить сервер
     /// \param addr IP адрес
     /// \param port порт

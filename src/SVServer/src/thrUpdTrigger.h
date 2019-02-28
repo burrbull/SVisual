@@ -34,27 +34,24 @@
 
 class thrUpdTrigger
 {
-
 public:
-
     thrUpdTrigger(SV_Srv::config, server*);
 
     ~thrUpdTrigger();
 
 private:
-
     SV_Srv::config cng;
 
     bool thrStop_ = false;
 
     std::thread thr_;
-	server* pServ_ = nullptr;
+    server* pServ_ = nullptr;
 
-	SV_Aux::TimerDelay tmDelay_;
+    SV_Aux::TimerDelay tmDelay_;
     SV_Aux::Front front_;
 
-	std::mutex mtx_;
+    std::mutex mtx_;
 
-	bool checkCondition(SV_Cng::triggerData* tr, SV_Cng::signalData* sd);
-	void updCycle();
+    bool checkCondition(SV_Cng::triggerData* tr, SV_Cng::signalData* sd);
+    void updCycle();
 };

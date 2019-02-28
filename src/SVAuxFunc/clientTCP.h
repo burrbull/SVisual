@@ -25,7 +25,6 @@
 #pragma once
 
 namespace SV_TcpCln{
-
     /// клиент TCP подключение
     /// \param addr IP адресс
     /// \param port порт

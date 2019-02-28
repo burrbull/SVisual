@@ -35,1202 +35,1149 @@
 
 using namespace SV_Cng;
 
-wdgGraph::wdgGraph(QWidget *parent, SV_Graph::config cng_){
+wdgGraph::wdgGraph(QWidget *parent, SV_Graph::config cng_) {
 
 #ifdef SV_EN
-	QTranslator translator;
-	translator.load(":/SVGp/svgraphpanel_en.qm");
-	QCoreApplication::installTranslator(&translator);
+    QTranslator translator;
+    translator.load(":/SVGp/svgraphpanel_en.qm");
+    QCoreApplication::installTranslator(&translator);
 #endif
 
-	setParent(parent);
+    setParent(parent);
 
-	ui.setupUi(this);
-			
-	setAcceptDrops(true);
-		
-	ui.wPlot->installEventFilter(this);
-	ui.wPlot->setAxisValue(ui.wAxisValue);
+    ui.setupUi(this);
+
+    setAcceptDrops(true);
+
+    ui.wPlot->installEventFilter(this);
+    ui.wPlot->setAxisValue(ui.wAxisValue);
 
     leftMarker_ = new wdgMarker(ui.wPlot);
-	rightMarker_ = new wdgMarker(ui.wPlot);
-				
+    rightMarker_ = new wdgMarker(ui.wPlot);
 
-	rightMarker_->setPos(QPoint(400,0));
+    rightMarker_->setPos(QPoint(400,0));
 
-	grPanel_ = (graphPanel*)parent;
-	cng = cng_;
-		
-	connect(ui.wAxisValue, SIGNAL(req_axisChange()), this, SLOT(axisValueChange()));
-	connect(ui.btnClose, &QPushButton::clicked, this, [this] {
+    grPanel_ = (graphPanel*)parent;
+    cng = cng_;
 
-		emit req_close();
-		close();
-		
-	});
+    connect(ui.wAxisValue, SIGNAL(req_axisChange()), this, SLOT(axisValueChange()));
 
-	connect(ui.btnUp, &QPushButton::clicked, this, [this] {
+    connect(ui.btnClose, &QPushButton::clicked, this, [this] {
+        emit req_close();
+        close();
+    });
 
-		emit req_graphUp(this->objectName());
-		
-	});
-	connect(ui.btnDn, &QPushButton::clicked, this, [this] {
+    connect(ui.btnUp, &QPushButton::clicked, this, [this] {
+        emit req_graphUp(this->objectName());
+    });
 
-		emit req_graphDn(this->objectName());
+    connect(ui.btnDn, &QPushButton::clicked, this, [this] {
+        emit req_graphDn(this->objectName());
+    });
 
-	});
-
-	
-	connect(ui.wPlot, SIGNAL(req_rctChange()), this, SLOT(resizeByRect()));
+    connect(ui.wPlot, SIGNAL(req_rctChange()), this, SLOT(resizeByRect()));
     connect(ui.wPlot, &wdgPlot::req_updMarker, this, &wdgGraph::showMarkPos);
-	connect(leftMarker_, SIGNAL(req_markerChange()), this, SLOT(updateByMarker()));
-	connect(rightMarker_, SIGNAL(req_markerChange()), this, SLOT(updateByMarker()));
-	
+    connect(leftMarker_, SIGNAL(req_markerChange()), this, SLOT(updateByMarker()));
+    connect(rightMarker_, SIGNAL(req_markerChange()), this, SLOT(updateByMarker()));
+    
 }
 
-wdgGraph::~wdgGraph(){}
+wdgGraph::~wdgGraph() {}
 
-QSize wdgGraph::sizeHint(){
-
-	return this->size();
+QSize wdgGraph::sizeHint() {
+    return this->size();
 }
 
-void wdgGraph::resizeEvent(QResizeEvent * event){
+void wdgGraph::resizeEvent(QResizeEvent * event) {
+    leftMarker_->setLimitPosX(0, ui.wPlot->width() - rightMarker_->width());
+    leftMarker_->setLimitPosY(ui.wPlot->height() - rightMarker_->height(), ui.wPlot->height() - rightMarker_->height());
 
-	leftMarker_->setLimitPosX(0, ui.wPlot->width() - rightMarker_->width());
-	leftMarker_->setLimitPosY(ui.wPlot->height() - rightMarker_->height(), ui.wPlot->height() - rightMarker_->height());
-	
-	rightMarker_->setLimitPosX(0, ui.wPlot->width() - rightMarker_->width());
-	rightMarker_->setLimitPosY(ui.wPlot->height() - rightMarker_->height(), ui.wPlot->height() - rightMarker_->height());
+    rightMarker_->setLimitPosX(0, ui.wPlot->width() - rightMarker_->width());
+    rightMarker_->setLimitPosY(ui.wPlot->height() - rightMarker_->height(), ui.wPlot->height() - rightMarker_->height());
 
-	repaintEna_ = true;
+    repaintEna_ = true;
 
-	QWidget::resizeEvent(event);
+    QWidget::resizeEvent(event);
 }
 
-void wdgGraph::addPosToHistory(){
+void wdgGraph::addPosToHistory() {
+    std::pair<double, double> valIntl = ui.wAxisValue->getValInterval();
 
-	std::pair<double, double> valIntl = ui.wAxisValue->getValInterval();
-	
-	std::pair<qint64, qint64> tmIntl = axisTime_->getTimeInterval();
+    std::pair<qint64, qint64> tmIntl = axisTime_->getTimeInterval();
 
-	historyPos_.push_back(histPos{ valIntl, tmIntl });
+    historyPos_.push_back(histPos{ valIntl, tmIntl });
 }
 
-void wdgGraph::paintSignals(){
+void wdgGraph::paintSignals() {
+    int h = ui.wPlot->height(), w = ui.wPlot->width();
+        
+    imSign_ = QImage(ui.wPlot->size(), QImage::Format_RGB888);
+    imSign_.fill(Qt::white);
 
-	int h = ui.wPlot->height(), w = ui.wPlot->width();
-		
-	imSign_ = QImage(ui.wPlot->size(), QImage::Format_RGB888);
-	imSign_.fill(Qt::white);
+    QPainter painter;
+    painter.begin(&imSign_);
 
-	QPainter painter;
-	painter.begin(&imSign_);
+    painter.translate(0, h);
+    painter.scale(1.0, -1.0);
 
-	painter.translate(0, h);
-	painter.scale(1.0, -1.0);
+    QPen pn; pn.setColor(Qt::gray); pn.setWidthF(0.2);
+    painter.setPen(pn);
 
-	QPen pn; pn.setColor(Qt::gray); pn.setWidthF(0.2);
-	painter.setPen(pn);
+    std::vector<int> axisMarkX = axisTime_->getAxisMark();
+    std::vector<int> axisMarkY = ui.wAxisValue->getAxisMark();
 
-	std::vector<int> axisMarkX = axisTime_->getAxisMark();
-	std::vector<int> axisMarkY = ui.wAxisValue->getAxisMark();
+    // axisX
+    int sz = axisMarkX.size();
+    for (int i = 0; i < sz; ++i) {
+        painter.drawLine(axisMarkX[i], 0, axisMarkX[i], h);
+    }
 
-	// axisX
-	int sz = axisMarkX.size();
-	for (int i = 0; i < sz; ++i){
-		painter.drawLine(axisMarkX[i], 0, axisMarkX[i], h);
-	}
+    // axisY
+    sz = axisMarkY.size();
+    for (int i = 0; i < sz; ++i) {
+        painter.drawLine(0, h - axisMarkY[i], w, h - axisMarkY[i]);
+    }
 
-	// axisY
-	sz = axisMarkY.size();
-	for (int i = 0; i < sz; ++i){
-		painter.drawLine(0, h - axisMarkY[i], w, h - axisMarkY[i]);
-	}
+    std::pair<qint64, qint64> tmInterv = axisTime_->getTimeInterval();
 
-	std::pair<qint64, qint64> tmInterv = axisTime_->getTimeInterval();
+    bool paintPnt = (tmInterv.second - tmInterv.first) < SV_CYCLESAVE_MS;
 
-	bool paintPnt = (tmInterv.second - tmInterv.first) < SV_CYCLESAVE_MS;
+    int signBoolCnt = 0;
+    auto sref = grPanel_->pfGetCopySignalRef();
+    for (auto& s : signalListAlter_) if (sref[s]->type == valueType::tBool) ++signBoolCnt;
+    for (int s = signalList_.size() - 1; s >= 0; --s) {
+        auto& sign = signals_[signalList_[s]];
 
-	
-	int signBoolCnt = 0;
-	auto sref = grPanel_->pfGetCopySignalRef();
-	for (auto& s : signalListAlter_) if (sref[s]->type == valueType::tBool) ++signBoolCnt;
-	for (int s = signalList_.size() - 1; s >= 0; --s){
+        painter.setBrush(sign.color);
+        painter.setPen(sign.color);
 
-		auto& sign = signals_[signalList_[s]];
+        if (sign.type != valueType::tBool) {
 
-		
-		painter.setBrush(sign.color);
-		painter.setPen(sign.color);
-		
-		if (sign.type != valueType::tBool){
+        int znSz = sign.pnts.size();
+            for (int z = 0; z < znSz; ++z) {
 
-		int znSz = sign.pnts.size();
-			for (int z = 0; z < znSz; ++z){
+                std::vector<std::pair<int, int>>& zonePnts = sign.pnts[z];
 
-				std::vector<std::pair<int, int>>& zonePnts = sign.pnts[z];
+                int sz = zonePnts.size();
 
-				int sz = zonePnts.size();
-												
-				for (int i = 1; i < sz; ++i){
-					painter.drawLine(zonePnts[i - 1].first, zonePnts[i - 1].second, zonePnts[i].first, zonePnts[i].second);
-										
-				}
-								
-				if (paintPnt){
-					QPen ptPen(sign.color);
-					ptPen.setCapStyle(Qt::RoundCap);
-					ptPen.setWidth(10);
-					painter.setPen(ptPen);
-					for (int i = 0; i < sz; ++i){
-						painter.drawPoint(zonePnts[i].first, zonePnts[i].second);
-					}
-				}
-			}
-		}
-		else{
+                for (int i = 1; i < sz; ++i) {
+                    painter.drawLine(zonePnts[i - 1].first, zonePnts[i - 1].second, zonePnts[i].first, zonePnts[i].second);
+                }
 
-			int znSz = sign.pnts.size(), sDist = 15, sH = 10;
-			for (int z = 0; z < znSz; ++z){
+                if (paintPnt) {
+                    QPen ptPen(sign.color);
+                    ptPen.setCapStyle(Qt::RoundCap);
+                    ptPen.setWidth(10);
+                    painter.setPen(ptPen);
+                    for (int i = 0; i < sz; ++i) {
+                        painter.drawPoint(zonePnts[i].first, zonePnts[i].second);
+                    }
+                }
+            }
+        }
+        else{
 
-				std::vector<std::pair<int, int>>& zonePnts = sign.pnts[z];
+            int znSz = sign.pnts.size(), sDist = 15, sH = 10;
+            for (int z = 0; z < znSz; ++z) {
 
-				int sz = zonePnts.size(), prevPos = 1, prevVal = zonePnts[0].second;
-				for (int i = 1; i < sz; ++i){
+                std::vector<std::pair<int, int>>& zonePnts = sign.pnts[z];
 
-					if ((prevVal == 0) && ((zonePnts[i].second > 0) || (i == (sz - 1)))){
-						painter.drawLine(zonePnts[prevPos - 1].first, signBoolCnt * sDist + 1, zonePnts[i].first, signBoolCnt * sDist + 1);
+                int sz = zonePnts.size(), prevPos = 1, prevVal = zonePnts[0].second;
+                for (int i = 1; i < sz; ++i) {
 
-						prevVal = 1;
-						prevPos = i;
-					}
-					else if ((prevVal > 0) && ((zonePnts[i].second == 0) || (i == (sz - 1)))){
-						
-						painter.drawRect(QRect(QPoint(zonePnts[prevPos - 1].first, signBoolCnt * sDist + 1),
-							QPoint(zonePnts[i - 1].first, signBoolCnt * sDist + 1 + sH)));
-												
-						prevVal = 0;
-						prevPos = i;
-					}
+                    if ((prevVal == 0) && ((zonePnts[i].second > 0) || (i == (sz - 1)))) {
+                        painter.drawLine(
+                            zonePnts[prevPos - 1].first, signBoolCnt * sDist + 1,
+                            zonePnts[i].first,           signBoolCnt * sDist + 1
+                        );
 
-				}
-			}
-			++signBoolCnt;
-		}
+                        prevVal = 1;
+                        prevPos = i;
+                    } else if ((prevVal > 0) && ((zonePnts[i].second == 0) || (i == (sz - 1)))) {
+                        painter.drawRect(QRect(
+                            QPoint(zonePnts[prevPos - 1].first, signBoolCnt * sDist + 1),
+                            QPoint(zonePnts[i - 1].first,       signBoolCnt * sDist + 1 + sH)
+                        ));
 
-	}
-	painter.end();
+                        prevVal = 0;
+                        prevPos = i;
+                    }
+
+                }
+            }
+            ++signBoolCnt;
+        }
+
+    }
+    painter.end();
 
 }
 
-void wdgGraph::paintSignalsAlter(){
+void wdgGraph::paintSignalsAlter() {
+    int h = ui.wPlot->height(), w = ui.wPlot->width();
 
-	int h = ui.wPlot->height(), w = ui.wPlot->width();
-		
-	QPainter painter;
-	painter.begin(&imSign_);
+    QPainter painter;
+    painter.begin(&imSign_);
 
-	painter.translate(0, h);
-	painter.scale(1.0, -1.0);
+    painter.translate(0, h);
+    painter.scale(1.0, -1.0);
 
-	QPen pn; pn.setColor(Qt::gray); pn.setWidthF(0.2);
-	painter.setPen(pn);
+    QPen pn; pn.setColor(Qt::gray); pn.setWidthF(0.2);
+    painter.setPen(pn);
 
-	
-	std::pair<qint64, qint64> tmInterv = axisTime_->getTimeInterval();
+    std::pair<qint64, qint64> tmInterv = axisTime_->getTimeInterval();
 
-	bool paintPnt = (tmInterv.second - tmInterv.first) < SV_CYCLESAVE_MS;
+    bool paintPnt = (tmInterv.second - tmInterv.first) < SV_CYCLESAVE_MS;
 
-	
-	int signBoolCnt = 0;
-	for (int s = signalListAlter_.size() - 1; s >= 0; --s){
+    int signBoolCnt = 0;
+    for (int s = signalListAlter_.size() - 1; s >= 0; --s) {
 
-		auto& sign = signalsAlter_[signalListAlter_[s]];
+        auto& sign = signalsAlter_[signalListAlter_[s]];
 
-		painter.setBrush(sign.color);
-		painter.setPen(sign.color);
+        painter.setBrush(sign.color);
+        painter.setPen(sign.color);
 
-		if (sign.type != valueType::tBool){
-			int znSz = sign.pnts.size();
-			for (int z = 0; z < znSz; ++z){
+        if (sign.type != valueType::tBool) {
+            int znSz = sign.pnts.size();
+            for (int z = 0; z < znSz; ++z) {
 
-				std::vector<std::pair<int, int>>& zonePnts = sign.pnts[z];
+                std::vector<std::pair<int, int>>& zonePnts = sign.pnts[z];
 
-				int sz = zonePnts.size();
+                int sz = zonePnts.size();
 
-				for (int i = 1; i < sz; ++i){
-					painter.drawLine(zonePnts[i - 1].first, zonePnts[i - 1].second, zonePnts[i].first, zonePnts[i].second);
-				}
+                for (int i = 1; i < sz; ++i) {
+                    painter.drawLine(
+                        zonePnts[i - 1].first, zonePnts[i - 1].second,
+                        zonePnts[i].first,     zonePnts[i].second
+                    );
+                }
 
-				
-				if (paintPnt){
-					QPen ptPen(sign.color);
-					ptPen.setCapStyle(Qt::RoundCap);
-					ptPen.setWidth(10);
-					painter.setPen(ptPen);
-					for (int i = 0; i < sz; ++i){
-						painter.drawPoint(zonePnts[i].first, zonePnts[i].second);
-					}
-				}
-			}
-		}
-		else{
+                if (paintPnt) {
+                    QPen ptPen(sign.color);
+                    ptPen.setCapStyle(Qt::RoundCap);
+                    ptPen.setWidth(10);
+                    painter.setPen(ptPen);
+                    for (int i = 0; i < sz; ++i) {
+                        painter.drawPoint(zonePnts[i].first, zonePnts[i].second);
+                    }
+                }
+            }
+        } else {
+            int znSz = sign.pnts.size(), sDist = 15, sH = 10;
+            for (int z = 0; z < znSz; ++z) {
 
-			int znSz = sign.pnts.size(), sDist = 15, sH = 10;
-			for (int z = 0; z < znSz; ++z){
+                std::vector<std::pair<int, int>>& zonePnts = sign.pnts[z];
 
-				std::vector<std::pair<int, int>>& zonePnts = sign.pnts[z];
+                int sz = zonePnts.size(), prevPos = 1, prevVal = zonePnts[0].second; 
+                for (int i = 1; i < sz; ++i) {
 
-				int sz = zonePnts.size(), prevPos = 1, prevVal = zonePnts[0].second; 
-				for (int i = 1; i < sz; ++i){
+                    if ((prevVal == 0) && ((zonePnts[i].second > 0) || (i == (sz - 1)))) {
+                        painter.drawLine(
+                            zonePnts[prevPos - 1].first, signBoolCnt * sDist + 1,
+                            zonePnts[i].first,           signBoolCnt * sDist + 1
+                        );
 
-					if ((prevVal == 0) && ((zonePnts[i].second > 0) || (i == (sz - 1)))){
-						painter.drawLine(zonePnts[prevPos - 1].first, signBoolCnt * sDist + 1, zonePnts[i].first, signBoolCnt * sDist + 1);
+                        prevVal = 1;
+                        prevPos = i;
+                    } else if ((prevVal > 0) && ((zonePnts[i].second == 0) || (i == (sz - 1)))) {
+                        painter.drawRect(QRect(
+                            QPoint(zonePnts[prevPos - 1].first, signBoolCnt * sDist + 1),
+                            QPoint(zonePnts[i - 1].first,       signBoolCnt * sDist + 1 + sH)
+                        ));
+                        prevVal = 0;
+                        prevPos = i;
+                    }
 
-						prevVal = 1;
-						prevPos = i;
-					}
-					else if ((prevVal > 0) && ((zonePnts[i].second == 0) || (i == (sz - 1)))){
-												
-						painter.drawRect(QRect(QPoint(zonePnts[prevPos - 1].first, signBoolCnt * sDist + 1),
-							                   QPoint(zonePnts[i - 1].first, signBoolCnt * sDist + 1 + sH)));
-						
-						prevVal = 0;
-						prevPos = i;
-					}
+                }
+            }
+            ++signBoolCnt;
+        }
 
-				}
-			}
-			++signBoolCnt;
-		}
-
-	}
-	painter.end();
-
-}
-
-void wdgGraph::paintObjects(){
-
-	int h = ui.wPlot->height(), w = ui.wPlot->width();
-
-	QPainter painter(ui.wPlot);
-
-	painter.drawImage(QPoint(0, 0), imSign_);
-		
-	//painter.setRenderHint(QPainter::Antialiasing);
-	painter.translate(0, h);
-	painter.scale(1.0, -1.0);
-
-	painter.setPen(Qt::red);
-
-	// leftMarker
-	int mLeftPosX = leftMarker_->pos().x() + leftMarker_->width() / 2;
-	painter.drawLine(mLeftPosX, 0, mLeftPosX, h);
-
-	//// rightMarker
-	int mRightPosX = rightMarker_->pos().x() + rightMarker_->width() / 2;
-	painter.drawLine(mRightPosX, 0, mRightPosX, h);
-
-
-	std::pair<qint64, qint64 > tmIntl = axisTime_->getTimeInterval();
-	double tmScale = axisTime_->getTimeScale();
-
-	if (leftMarker_->IsSelect || selLeftMark_){
-		selLeftMark_ = false;
-		QDateTime dtm = QDateTime::fromMSecsSinceEpoch(tmIntl.first + mLeftPosX*tmScale);
-
-		QToolTip::showText(this->cursor().pos(), dtm.toString("dd.MM.yy hh:mm:ss:zzz"), this);
-	}
-	auto sValuePnt = getSignalValueByMarkerPos(mLeftPosX);
-
-	for (auto s : sValuePnt){
-
-		if (s.type != valueType::tBool){
-
-			signals_[s.sign].lbLeftMarkVal->move(QPoint(s.xPix + 2, ui.wPlot->height() - s.yPix - 22));
-			signals_[s.sign].lbLeftMarkVal->setText(getSValue(s.type, s.val).c_str());
-			signals_[s.sign].lbLeftMarkVal->show();
-		}
-	}
-	
-
-	if (rightMarker_->IsSelect || selRigthMark_){
-		selRigthMark_ = false;
-		QDateTime dtm = QDateTime::fromMSecsSinceEpoch(tmIntl.first + mRightPosX*tmScale);
-
-		QToolTip::showText(this->cursor().pos(), dtm.toString("dd.MM.yy hh:mm:ss:zzz"), this);
-	}
-
-	sValuePnt = getSignalValueByMarkerPos(mRightPosX);
-	for (auto s : sValuePnt){
-
-		if (s.type != valueType::tBool){
-
-			signals_[s.sign].lbRightMarkVal->move(QPoint(s.xPix + 2, ui.wPlot->height() - s.yPix - 22));
-			signals_[s.sign].lbRightMarkVal->setText(getSValue(s.type, s.val).c_str());
-			signals_[s.sign].lbRightMarkVal->show();
-		}
-	}
-}
-
-void wdgGraph::paintObjectsAlter(){
-		
-	// leftMarker
-	int mLeftPosX = leftMarker_->pos().x() + leftMarker_->width() / 2;
-
-	//// rightMarker
-	int mRightPosX = rightMarker_->pos().x() + rightMarker_->width() / 2;
-
-	std::pair<qint64, qint64 > tmIntl = axisTime_->getTimeInterval();
-	double tmScale = axisTime_->getTimeScale();
-
-	if (leftMarker_->IsSelect || selLeftMark_){
-		selLeftMark_ = false;
-
-		QDateTime dtm = QDateTime::fromMSecsSinceEpoch(tmIntl.first + mLeftPosX*tmScale);
-
-		QToolTip::showText(this->cursor().pos(), dtm.toString("dd.MM.yy hh:mm:ss:zzz"), this);
-	}
-	auto sValuePnt = getSignalAlterValueByMarkerPos(mLeftPosX);
-	for (auto s : sValuePnt){
-
-		if (s.type != valueType::tBool){
-
-			signalsAlter_[s.sign].lbLeftMarkVal->move(QPoint(s.xPix + 2, ui.wPlot->height() - s.yPix - 22));
-			signalsAlter_[s.sign].lbLeftMarkVal->setText(getSValue(s.type, s.val).c_str());
-			signalsAlter_[s.sign].lbLeftMarkVal->show();
-		}
-	}
-
-	if (rightMarker_->IsSelect || selRigthMark_){
-		selRigthMark_ = false;
-
-		QDateTime dtm = QDateTime::fromMSecsSinceEpoch(tmIntl.first + mRightPosX*tmScale);
-
-		QToolTip::showText(this->cursor().pos(), dtm.toString("dd.MM.yy hh:mm:ss:zzz"), this);
-	}
-
-	sValuePnt = getSignalAlterValueByMarkerPos(mRightPosX);
-	for (auto s : sValuePnt){
-
-		if (s.type != valueType::tBool){
-
-			signalsAlter_[s.sign].lbRightMarkVal->move(QPoint(s.xPix + 2, ui.wPlot->height() - s.yPix - 22));
-			signalsAlter_[s.sign].lbRightMarkVal->setText(getSValue(s.type, s.val).c_str());
-			signalsAlter_[s.sign].lbRightMarkVal->show();
-		}
-	}
+    }
+    painter.end();
 
 }
 
-bool wdgGraph::eventFilter(QObject *target, QEvent *event){
+void wdgGraph::paintObjects() {
+    int h = ui.wPlot->height(), w = ui.wPlot->width();
 
-	if ((target->objectName() == "wPlot") && (event->type() == QEvent::Paint)){
-		
-		if (repaintEna_){
+    QPainter painter(ui.wPlot);
+
+    painter.drawImage(QPoint(0, 0), imSign_);
+        
+    //painter.setRenderHint(QPainter::Antialiasing);
+    painter.translate(0, h);
+    painter.scale(1.0, -1.0);
+
+    painter.setPen(Qt::red);
+
+    // leftMarker
+    int mLeftPosX = leftMarker_->pos().x() + leftMarker_->width() / 2;
+    painter.drawLine(mLeftPosX, 0, mLeftPosX, h);
+
+    //// rightMarker
+    int mRightPosX = rightMarker_->pos().x() + rightMarker_->width() / 2;
+    painter.drawLine(mRightPosX, 0, mRightPosX, h);
+
+
+    std::pair<qint64, qint64 > tmIntl = axisTime_->getTimeInterval();
+    double tmScale = axisTime_->getTimeScale();
+
+    if (leftMarker_->IsSelect || selLeftMark_) {
+        selLeftMark_ = false;
+        QDateTime dtm = QDateTime::fromMSecsSinceEpoch(tmIntl.first + mLeftPosX*tmScale);
+
+        QToolTip::showText(this->cursor().pos(), dtm.toString("dd.MM.yy hh:mm:ss:zzz"), this);
+    }
+
+    auto sValuePnt = getSignalValueByMarkerPos(mLeftPosX);
+
+    for (auto s : sValuePnt) {
+        if (s.type != valueType::tBool) {
+            signals_[s.sign].lbLeftMarkVal->move(QPoint(s.xPix + 2, ui.wPlot->height() - s.yPix - 22));
+            signals_[s.sign].lbLeftMarkVal->setText(getSValue(s.type, s.val).c_str());
+            signals_[s.sign].lbLeftMarkVal->show();
+        }
+    }
+    
+
+    if (rightMarker_->IsSelect || selRigthMark_) {
+        selRigthMark_ = false;
+        QDateTime dtm = QDateTime::fromMSecsSinceEpoch(tmIntl.first + mRightPosX*tmScale);
+
+        QToolTip::showText(this->cursor().pos(), dtm.toString("dd.MM.yy hh:mm:ss:zzz"), this);
+    }
+
+    sValuePnt = getSignalValueByMarkerPos(mRightPosX);
+    for (auto s : sValuePnt) {
+        if (s.type != valueType::tBool) {
+            signals_[s.sign].lbRightMarkVal->move(QPoint(s.xPix + 2, ui.wPlot->height() - s.yPix - 22));
+            signals_[s.sign].lbRightMarkVal->setText(getSValue(s.type, s.val).c_str());
+            signals_[s.sign].lbRightMarkVal->show();
+        }
+    }
+}
+
+void wdgGraph::paintObjectsAlter() {
+    // leftMarker
+    int mLeftPosX = leftMarker_->pos().x() + leftMarker_->width() / 2;
+
+    //// rightMarker
+    int mRightPosX = rightMarker_->pos().x() + rightMarker_->width() / 2;
+
+    std::pair<qint64, qint64 > tmIntl = axisTime_->getTimeInterval();
+    double tmScale = axisTime_->getTimeScale();
+
+    if (leftMarker_->IsSelect || selLeftMark_) {
+        selLeftMark_ = false;
+
+        QDateTime dtm = QDateTime::fromMSecsSinceEpoch(tmIntl.first + mLeftPosX*tmScale);
+
+        QToolTip::showText(this->cursor().pos(), dtm.toString("dd.MM.yy hh:mm:ss:zzz"), this);
+    }
+
+    auto sValuePnt = getSignalAlterValueByMarkerPos(mLeftPosX);
+    for (auto s : sValuePnt) {
+
+        if (s.type != valueType::tBool) {
+            signalsAlter_[s.sign].lbLeftMarkVal->move(QPoint(s.xPix + 2, ui.wPlot->height() - s.yPix - 22));
+            signalsAlter_[s.sign].lbLeftMarkVal->setText(getSValue(s.type, s.val).c_str());
+            signalsAlter_[s.sign].lbLeftMarkVal->show();
+        }
+    }
+
+    if (rightMarker_->IsSelect || selRigthMark_) {
+        selRigthMark_ = false;
+
+        QDateTime dtm = QDateTime::fromMSecsSinceEpoch(tmIntl.first + mRightPosX*tmScale);
+
+        QToolTip::showText(this->cursor().pos(), dtm.toString("dd.MM.yy hh:mm:ss:zzz"), this);
+    }
+
+    sValuePnt = getSignalAlterValueByMarkerPos(mRightPosX);
+
+    for (auto s : sValuePnt) {
+        if (s.type != valueType::tBool) {
+            signalsAlter_[s.sign].lbRightMarkVal->move(QPoint(s.xPix + 2, ui.wPlot->height() - s.yPix - 22));
+            signalsAlter_[s.sign].lbRightMarkVal->setText(getSValue(s.type, s.val).c_str());
+            signalsAlter_[s.sign].lbRightMarkVal->show();
+        }
+    }
+}
+
+bool wdgGraph::eventFilter(QObject *target, QEvent *event) {
+    if ((target->objectName() == "wPlot") && (event->type() == QEvent::Paint)) {
+        if (repaintEna_) {
             paintSignals();
-			if (!signalListAlter_.isEmpty()) paintSignalsAlter();
-		}
-		
-		paintObjects();
-		if (!signalListAlter_.isEmpty()) paintObjectsAlter();
+            if (!signalListAlter_.isEmpty())
+                paintSignalsAlter();
+        }
 
+        paintObjects();
+        if (!signalListAlter_.isEmpty())
+            paintObjectsAlter();
 
-		repaintEna_ = false;				
-	}
+        repaintEna_ = false;
+    }
 
-	if (event->type() == QEvent::MouseButtonPress){
-				
-		emit req_selectGraph(this->objectName());
-			
-	}
+    if (event->type() == QEvent::MouseButtonPress) {
+        emit req_selectGraph(this->objectName());
+    }
 
-	return QWidget::eventFilter(target, event);
+    return QWidget::eventFilter(target, event);
 }
 
-void wdgGraph::addSignal(QString sign){
-	
-	if (!signals_.contains(sign)){
-				
-		int num = signals_.size();
+void wdgGraph::addSignal(QString sign) {
+    if (!signals_.contains(sign)) {
+        int num = signals_.size();
 
-		colorCnt_ += 30;
-		QColor clr = QColor((num * (60 + colorCnt_)) % 255, (num * (120 + colorCnt_)) % 255, (num * (180 + colorCnt_)) % 255, 255);
+        colorCnt_ += 30;
+        QColor clr = QColor((num * (60 + colorCnt_)) % 255, (num * (120 + colorCnt_)) % 255, (num * (180 + colorCnt_)) % 255, 255);
 
-		dragLabel* lb = new dragLabel(this);
+        dragLabel* lb = new dragLabel(this);
         QLabel* lbLeftVal = new QLabel(ui.wPlot);
-		QLabel* lbRightVal = new QLabel(ui.wPlot);
+        QLabel* lbRightVal = new QLabel(ui.wPlot);
 
-		signalData* sd = grPanel_->pfGetSignalData(sign);
+        signalData* sd = grPanel_->pfGetSignalData(sign);
 
-		signals_.insert(sign, graphSignData{ sign, sd->name.c_str(), sd->type, num, clr, lb, lbLeftVal, lbRightVal });
-		signalList_.push_front(sign);
+        signals_.insert(sign, graphSignData{ sign, sd->name.c_str(), sd->type, num, clr, lb, lbLeftVal, lbRightVal });
+        signalList_.push_front(sign);
 
-		QPalette palette = lb->palette();
-		palette.setColor(lb->foregroundRole(), clr);
-		lb->setPalette(palette);
-		lb->setText((sd->name + " " + sd->comment).c_str());
-		lb->setSignal(sign);
-		ui.vLayoutSignName->insertWidget(0,lb);
+        QPalette palette = lb->palette();
+        palette.setColor(lb->foregroundRole(), clr);
+        lb->setPalette(palette);
+        lb->setText((sd->name + " " + sd->comment).c_str());
+        lb->setSignal(sign);
+        ui.vLayoutSignName->insertWidget(0,lb);
         lbLeftVal->setPalette(palette);
-		lbRightVal->setPalette(palette);
+        lbRightVal->setPalette(palette);
 
-		connect(lb, SIGNAL(req_delSignal(QString)), this, SLOT(delSignal(QString)));
-		
-		
-		if (sd->type != valueType::tBool){
+        connect(lb, SIGNAL(req_delSignal(QString)), this, SLOT(delSignal(QString)));
 
-			if (sd->buffMinValue < sd->buffMaxValue)
-				ui.wAxisValue->setValInterval(sd->buffMinValue - 1, sd->buffMaxValue + 1);
-			else
-				ui.wAxisValue->setValInterval(-100, 100);
-		}
-		
-		axisValueChange();
+        if (sd->type != valueType::tBool) {
 
-		addPosToHistory();	
-	}
+            if (sd->buffMinValue < sd->buffMaxValue)
+                ui.wAxisValue->setValInterval(sd->buffMinValue - 1, sd->buffMaxValue + 1);
+            else
+                ui.wAxisValue->setValInterval(-100, 100);
+        }
+        
+        axisValueChange();
+
+        addPosToHistory();
+    }
 }
 
-void wdgGraph::addAlterSignal(QString sign){
+void wdgGraph::addAlterSignal(QString sign) {
+    if (!signalsAlter_.contains(sign)) {
+        int num = signalsAlter_.size() + 1;
 
-	if (!signalsAlter_.contains(sign)){
+        colorCnt_ += 30;
+        QColor clr = QColor((num * (60 + colorCnt_)) % 255, (num * (120 + colorCnt_)) % 255, (num * (180 + colorCnt_)) % 255, 255);
 
-		int num = signalsAlter_.size() + 1;
+        dragLabel* lb = new dragLabel(this);
+        QLabel* lbLeftVal = new QLabel(ui.wPlot);
+        QLabel* lbRightVal = new QLabel(ui.wPlot);
 
-		colorCnt_ += 30;
-		QColor clr = QColor((num * (60 + colorCnt_)) % 255, (num * (120 + colorCnt_)) % 255, (num * (180 + colorCnt_)) % 255, 255);
+        signalData* sd = grPanel_->pfGetSignalData(sign);
 
-		dragLabel* lb = new dragLabel(this);
-		QLabel* lbLeftVal = new QLabel(ui.wPlot);
-		QLabel* lbRightVal = new QLabel(ui.wPlot);
+        signalsAlter_.insert(sign, graphSignData{ sign, sd->name.c_str(), sd->type, num, clr, lb, lbLeftVal, lbRightVal });
+        signalListAlter_.push_front(sign);
 
-		signalData* sd = grPanel_->pfGetSignalData(sign);
+        QPalette palette = lb->palette();
+        palette.setColor(lb->foregroundRole(), clr);
+        lb->setPalette(palette);
+        lb->setText((sd->name + " " + sd->comment).c_str());
+        lb->setSignal(sign);
+        ui.vLayoutAuxSignName->insertWidget(0, lb);
+        lbLeftVal->setPalette(palette);
+        lbRightVal->setPalette(palette);
 
-		signalsAlter_.insert(sign, graphSignData{ sign, sd->name.c_str(), sd->type, num, clr, lb, lbLeftVal, lbRightVal });
-		signalListAlter_.push_front(sign);
+        connect(lb, SIGNAL(req_delSignal(QString)), this, SLOT(delSignalAlter(QString)));
 
-		QPalette palette = lb->palette();
-		palette.setColor(lb->foregroundRole(), clr);
-		lb->setPalette(palette);
-		lb->setText((sd->name + " " + sd->comment).c_str());
-		lb->setSignal(sign);
-		ui.vLayoutAuxSignName->insertWidget(0, lb);
-		lbLeftVal->setPalette(palette);
-		lbRightVal->setPalette(palette);
+        axisTimeChange();
 
-		connect(lb, SIGNAL(req_delSignal(QString)), this, SLOT(delSignalAlter(QString)));
-
-		axisTimeChange();
-				
-		addPosToHistory();
-	}
-
+        addPosToHistory();
+    }
 }
 
-QStringList wdgGraph::getAllSignals(){
-
-	return signalList_;
+QStringList wdgGraph::getAllSignals() {
+    return signalList_;
 }
 
-QStringList wdgGraph::getAllAlterSignals(){
-
-
-	return signalListAlter_;
-}
-void wdgGraph::setAxisTime(wdgAxisTime* axisTime){
-
-	axisTime_ = axisTime;
-
-	ui.wPlot->setAxisTime(axisTime);
-
+QStringList wdgGraph::getAllAlterSignals() {
+    return signalListAlter_;
 }
 
-void wdgGraph::dragEnterEvent(QDragEnterEvent *event)
-{
-	if (qobject_cast<QTreeWidget *>(event->source()) ||
-		qobject_cast<dragLabel *>(event->source())) {
+void wdgGraph::setAxisTime(wdgAxisTime* axisTime) {
+    axisTime_ = axisTime;
 
-		event->accept();
-	}
+    ui.wPlot->setAxisTime(axisTime);
 }
 
-void wdgGraph::dragMoveEvent(QDragMoveEvent *event){
+void wdgGraph::dragEnterEvent(QDragEnterEvent *event) {
+    if (qobject_cast<QTreeWidget *>(event->source()) ||
+        qobject_cast<dragLabel *>(event->source())) {
 
-	if (qobject_cast<QTreeWidget *>(event->source()) ||
-		qobject_cast<dragLabel *>(event->source())) {
-
-		event->accept();
-	}
+        event->accept();
+    }
 }
 
-void wdgGraph::dropEvent(QDropEvent *event)
-{
-	dragLabel* lb = qobject_cast<dragLabel *>(event->source());
+void wdgGraph::dragMoveEvent(QDragMoveEvent *event) {
+    if (qobject_cast<QTreeWidget *>(event->source()) ||
+        qobject_cast<dragLabel *>(event->source())) {
 
-	if (qobject_cast<QTreeWidget *>(event->source()) || lb) {
-		
-		QString sign = event->mimeData()->text();
-
-		if (!sign.isEmpty()){
-
-			auto sd = grPanel_->pfGetSignalData(sign);
-
-			if (sd && !sd->isBuffEnable && grPanel_->pfLoadSignalData)
-				grPanel_->pfLoadSignalData(sign);
-
-			if (lb){
-
-				if (signals_.contains(sign)){
-					delSignal(sign, false);
-					addAlterSignal(sign);
-				}
-				else{
-					delSignalAlter(sign, false);
-					addSignal(sign);
-				}				
-			}
-			else addSignal(sign);
-	
-	
-	
-			emit req_markerChange(this->objectName());
-		}	
-
-		event->accept();
-	}
+        event->accept();
+    }
 }
 
-void wdgGraph::setMarkersPos(QPoint left, QPoint right){
+void wdgGraph::dropEvent(QDropEvent *event) {
+    dragLabel* lb = qobject_cast<dragLabel *>(event->source());
 
-	left.setX(left.x() - leftMarker_->width() / 2);
-	right.setX(right.x() - rightMarker_->width() / 2);
+    if (qobject_cast<QTreeWidget *>(event->source()) || lb) {
 
-	leftMarker_->setPos(left);
-	rightMarker_->setPos(right);
+        QString sign = event->mimeData()->text();
+
+        if (!sign.isEmpty()) {
+            auto sd = grPanel_->pfGetSignalData(sign);
+
+            if (sd && !sd->isBuffEnable && grPanel_->pfLoadSignalData)
+                grPanel_->pfLoadSignalData(sign);
+
+            if (lb) {
+                if (signals_.contains(sign)) {
+                    delSignal(sign, false);
+                    addAlterSignal(sign);
+                } else {
+                    delSignalAlter(sign, false);
+                    addSignal(sign);
+                }
+            } else
+                addSignal(sign);
+
+            emit req_markerChange(this->objectName());
+        }
+
+        event->accept();
+    }
 }
 
-void wdgGraph::getMarkersPos(QPoint& left, QPoint& right){
+void wdgGraph::setMarkersPos(QPoint left, QPoint right) {
+    left.setX(left.x() - leftMarker_->width() / 2);
+    right.setX(right.x() - rightMarker_->width() / 2);
 
-	left = leftMarker_->pos(); left.setX(left.x() + leftMarker_->width() / 2);
-	right = rightMarker_->pos(); right.setX(right.x() + rightMarker_->width() / 2);
+    leftMarker_->setPos(left);
+    rightMarker_->setPos(right);
 }
 
-std::vector<std::vector<std::pair<int, int>>> wdgGraph::getSignalPnt(signalData* sign, bool isAlter){
-		
-	double tmScale = axisTime_->getTimeScale(); 
-	double valScale = ui.wAxisValue->getValScale(); 
+void wdgGraph::getMarkersPos(QPoint& left, QPoint& right) {
+    left = leftMarker_->pos();
+    left.setX(left.x() + leftMarker_->width() / 2);
+    
+    right = rightMarker_->pos();
+    right.setX(right.x() + rightMarker_->width() / 2);
+}
 
-	std::pair<qint64, qint64> tmInterval = axisTime_->getTimeInterval();
-	std::pair<double, double> valInterval = ui.wAxisValue->getValInterval();
-	
-	double valMinInterval = valInterval.first, valMaxInterval = valInterval.second;
+std::vector<std::vector<std::pair<int, int>>> wdgGraph::getSignalPnt(signalData* sign, bool isAlter) {
 
-	if (isAlter){
-		valInterval = getSignMaxMinValue(sign, tmInterval);
-		valMinInterval = valInterval.first - 1, valMaxInterval = valInterval.second + 3;
-		valScale = (valMaxInterval - valMinInterval) / ui.wPlot->height();
-	}
+    double tmScale = axisTime_->getTimeScale(); 
+    double valScale = ui.wAxisValue->getValScale(); 
+
+    std::pair<qint64, qint64> tmInterval = axisTime_->getTimeInterval();
+    std::pair<double, double> valInterval = ui.wAxisValue->getValInterval();
+
+    double valMinInterval = valInterval.first, valMaxInterval = valInterval.second;
+
+    if (isAlter) {
+        valInterval = getSignMaxMinValue(sign, tmInterval);
+        valMinInterval = valInterval.first - 1, valMaxInterval = valInterval.second + 3;
+        valScale = (valMaxInterval - valMinInterval) / ui.wPlot->height();
+    }
 
     if (!sign->isBuffEnable && grPanel_->pfLoadSignalData)
-    	grPanel_->pfLoadSignalData(QString::fromStdString(sign->name + sign->module));
+        grPanel_->pfLoadSignalData(QString::fromStdString(sign->name + sign->module));
 
-	int znSz = sign->buffData.size();
+    int znSz = sign->buffData.size();
 
-	if (znSz == 0) return std::vector<std::vector<std::pair<int, int>>>();
-		
-	uint64_t tmZnBegin = sign->buffMinTime,
-		tmZnEnd = sign->buffMaxTime,
-		tmMinInterval = tmInterval.first,
-		tmMaxInterval = tmInterval.second;
-	if ((tmZnBegin >= tmMaxInterval) || (tmZnEnd <= tmMinInterval)) return std::vector<std::vector<std::pair<int, int>>>();
-			
-	int z = sign->buffBeginPos;
-		
-	std::vector<std::vector<std::pair<int, int>>> zonePnts(1);
-	zonePnts.back().reserve(axisTime_->width());
-		
-	int prevPos = 0, endPos = sign->buffValuePos;
-	uint64_t tmZnEndPrev = sign->buffData[z].beginTime;
-	
-	tmZnEnd = tmZnBegin + SV_CYCLESAVE_MS;
-		
-	std::vector<double> tmPosMem;
-	for (int i = 0; i < SV_PACKETSZ; ++i)
+    if (znSz == 0)
+        return std::vector<std::vector<std::pair<int, int>>>();
+
+    uint64_t tmZnBegin = sign->buffMinTime,
+        tmZnEnd = sign->buffMaxTime,
+        tmMinInterval = tmInterval.first,
+        tmMaxInterval = tmInterval.second;
+    if ((tmZnBegin >= tmMaxInterval) || (tmZnEnd <= tmMinInterval))
+        return std::vector<std::vector<std::pair<int, int>>>();
+
+    int z = sign->buffBeginPos;
+
+    std::vector<std::vector<std::pair<int, int>>> zonePnts(1);
+    zonePnts.back().reserve(axisTime_->width());
+
+    int prevPos = 0, endPos = sign->buffValuePos;
+    uint64_t tmZnEndPrev = sign->buffData[z].beginTime;
+
+    tmZnEnd = tmZnBegin + SV_CYCLESAVE_MS;
+
+    std::vector<double> tmPosMem;
+    for (int i = 0; i < SV_PACKETSZ; ++i)
         tmPosMem.push_back((i * SV_CYCLEREC_MS - double(tmMinInterval)) / tmScale);
 
-	double valPosMem = valMinInterval / valScale;
-	double tmZnBeginMem = double(tmZnBegin) / tmScale;
-	
-	std::pair<int , int> pnt;
-	int valMem = 0, backVal = 0, prevBackVal = 0, backValInd = -1, prevBackValInd = -2;
-	bool isChange = false;
-    while (tmZnBegin < tmMaxInterval){
+    double valPosMem = valMinInterval / valScale;
+    double tmZnBeginMem = double(tmZnBegin) / tmScale;
 
-		if (tmZnEnd > tmMinInterval){
-			recData& rd = sign->buffData[z];
+    std::pair<int , int> pnt;
+    int valMem = 0, backVal = 0, prevBackVal = 0, backValInd = -1, prevBackValInd = -2;
+    bool isChange = false;
+    while (tmZnBegin < tmMaxInterval) {
 
-          	if (int(tmZnBegin - tmZnEndPrev) > SV_CYCLESAVE_MS){
-				zonePnts.push_back(std::vector<std::pair<int, int>>());
-				isChange = false;
-				backValInd = -1;
-				prevBackValInd = -2;
-			}
+        if (tmZnEnd > tmMinInterval) {
+            recData& rd = sign->buffData[z];
 
-			tmZnBeginMem = double(tmZnBegin) / tmScale;
+            if (int(tmZnBegin - tmZnEndPrev) > SV_CYCLESAVE_MS) {
+                zonePnts.push_back(std::vector<std::pair<int, int>>());
+                isChange = false;
+                backValInd = -1;
+                prevBackValInd = -2;
+            }
+
+            tmZnBeginMem = double(tmZnBegin) / tmScale;
             auto& backZone = zonePnts.back();
 
-			for (int i = 0; i < SV_PACKETSZ; ++i){
-				pnt.first = tmPosMem[i] + tmZnBeginMem;
+            for (int i = 0; i < SV_PACKETSZ; ++i) {
+                pnt.first = tmPosMem[i] + tmZnBeginMem;
 
-                switch (sign->type)	{
-				case valueType::tInt: pnt.second = rd.vals[i].tInt / valScale - valPosMem; break;
-				case valueType::tBool: pnt.second = rd.vals[i].tBool; break;
-				case valueType::tFloat: pnt.second = rd.vals[i].tFloat / valScale - valPosMem; break;
-				}
+                switch (sign->type)    {
+                    case valueType::tInt:
+                        pnt.second = rd.vals[i].tInt / valScale - valPosMem;
+                        break;
+                    case valueType::tBool:
+                        pnt.second = rd.vals[i].tBool;
+                        break;
+                    case valueType::tFloat:
+                        pnt.second = rd.vals[i].tFloat / valScale - valPosMem;
+                        break;
+                }
 
-                if (pnt.first != prevPos){
-					isChange = false;
-					prevPos = pnt.first;
+                if (pnt.first != prevPos) {
+                    isChange = false;
+                    prevPos = pnt.first;
 
                     backZone.push_back(pnt);
-					++backValInd;
-					++prevBackValInd;
-				}
-				else if (pnt.second != valMem){
-					valMem = pnt.second;
-						
-					if (!isChange){
+                    ++backValInd;
+                    ++prevBackValInd;
+                } else if (pnt.second != valMem) {
+                    valMem = pnt.second;
+
+                    if (!isChange) {
                         backZone.push_back(pnt);
-						++backValInd;
-						++prevBackValInd;
-								
-						if (prevBackValInd >= 0){
-							isChange = true;
-							backVal = backZone[backValInd].second;
-							prevBackVal = backZone[prevBackValInd].second;
-						}
-					}
-					else{
-						if (prevBackVal <= backVal){
-							if (valMem < prevBackVal){
-								prevBackVal = valMem;
+                        ++backValInd;
+                        ++prevBackValInd;
+
+                        if (prevBackValInd >= 0) {
+                            isChange = true;
+                            backVal = backZone[backValInd].second;
+                            prevBackVal = backZone[prevBackValInd].second;
+                        }
+                    } else {
+                        if (prevBackVal <= backVal) {
+                            if (valMem < prevBackVal) {
+                                prevBackVal = valMem;
                                 backZone[prevBackValInd].second = valMem;
-							}
-							else if (valMem > backVal){
-								backVal = valMem;
+                            } else if (valMem > backVal) {
+                                backVal = valMem;
                                 backZone[backValInd].second = valMem;
-							}
-						}
-						else{
-							if (valMem > prevBackVal){
-								prevBackVal = valMem;
+                            }
+                        } else {
+                            if (valMem > prevBackVal) {
+                                prevBackVal = valMem;
                                 backZone[prevBackValInd].second = valMem;
-							}
-							else if (valMem < backVal){
-								backVal = valMem;
+                            } else if (valMem < backVal) {
+                                backVal = valMem;
                                 backZone[backValInd].second = valMem;
-							}
-						}
-					}
-				}
-			}
-		}
-		tmZnEndPrev = tmZnEnd;
+                            }
+                        }
+                    }
+                }
+            }
+        }
 
-		++z; if (z >= znSz) z = 0;
+        tmZnEndPrev = tmZnEnd;
 
-		if (z != endPos){
-			tmZnBegin = sign->buffData[z].beginTime;
-			tmZnEnd = tmZnBegin + SV_CYCLESAVE_MS;
-		}
-		else break;
-	}
-	
-	int sz = zonePnts.size();
-	for (auto it = zonePnts.begin(); it != zonePnts.end(); ++it){
-		if ((*it).empty()){
-			zonePnts.erase(it);
-		}
-	}
+        ++z;
+        if (z >= znSz)
+            z = 0;
 
-	return zonePnts;
+        if (z != endPos) {
+            tmZnBegin = sign->buffData[z].beginTime;
+            tmZnEnd = tmZnBegin + SV_CYCLESAVE_MS;
+        }
+        else break;
+    }
+    
+    int sz = zonePnts.size();
+    for (auto it = zonePnts.begin(); it != zonePnts.end(); ++it) {
+        if ((*it).empty()) {
+            zonePnts.erase(it);
+        }
+    }
+
+    return zonePnts;
 }
 
-std::pair<double, double> wdgGraph::getSignMaxMinValue(graphSignData* sign){
+std::pair<double, double> wdgGraph::getSignMaxMinValue(graphSignData* sign) {
+    std::vector<std::vector<std::pair<int, int>>>& grPnts = sign->pnts;
 
-	std::vector<std::vector<std::pair<int, int>>>& grPnts = sign->pnts;
+    int gSz = grPnts.size();
+    double minVal = INT32_MAX, maxVal = -INT32_MAX;
 
-	int gSz = grPnts.size(); double minVal = INT32_MAX, maxVal = -INT32_MAX;
-	for (int g = 0; g < gSz; ++g){
+    for (int g = 0; g < gSz; ++g) {
+        int sz = grPnts[g].size();
+        for (int i = 0; i < sz; ++i) {
+            if (grPnts[g][i].second < minVal)
+                minVal = grPnts[g][i].second;
 
-		int sz = grPnts[g].size();
-		for (int i = 0; i < sz; ++i){
+            if (grPnts[g][i].second > maxVal)
+                maxVal = grPnts[g][i].second;
+        }
+    }
 
-			if (grPnts[g][i].second < minVal) minVal = grPnts[g][i].second;
-			if (grPnts[g][i].second > maxVal) maxVal = grPnts[g][i].second;
-		}
-	}
-
-	if ((minVal == INT32_MAX) || (maxVal == -INT32_MAX)) {
-		minVal = 0;
-		maxVal = 1;
-	}
-	return std::pair<double, double> (minVal, maxVal);
+    if ((minVal == INT32_MAX) || (maxVal == -INT32_MAX)) {
+        minVal = 0;
+        maxVal = 1;
+    }
+    return std::pair<double, double> (minVal, maxVal);
 }
 
-std::pair<double, double> wdgGraph::getSignMaxMinValue(signalData* sign, std::pair<qint64, qint64>& tmInterval){
+std::pair<double, double> wdgGraph::getSignMaxMinValue(signalData* sign, std::pair<qint64, qint64>& tmInterval) {
 
-	uint64_t tmZnBegin = sign->buffMinTime,
-		tmZnEnd = sign->buffMaxTime,
-		tmMinInterval = tmInterval.first,
-		tmMaxInterval = tmInterval.second;
+    uint64_t tmZnBegin = sign->buffMinTime,
+        tmZnEnd = sign->buffMaxTime,
+        tmMinInterval = tmInterval.first,
+        tmMaxInterval = tmInterval.second;
 
-	if ((tmZnBegin >= tmMaxInterval) || (tmZnEnd <= tmMinInterval)) return std::pair<double, double >(0,1);
+    if ((tmZnBegin >= tmMaxInterval) || (tmZnEnd <= tmMinInterval))
+        return std::pair<double, double>(0,1);
 
-	auto rdata = sign->buffData;
+    auto rdata = sign->buffData;
 
-	int znSz = rdata.size(), z = 0; double minVal = INT32_MAX, maxVal = -INT32_MAX;
+    int znSz = rdata.size(), z = 0;
+    double minVal = INT32_MAX, maxVal = -INT32_MAX;
 
-	switch (sign->type)
-	{
-		case valueType::tInt:
+    switch (sign->type) {
+        case valueType::tInt:
+            while (tmZnBegin < tmMaxInterval) {
+                if (tmZnEnd > tmMinInterval) {
+                    for (int i = 0; i < SV_PACKETSZ; ++i) {
+                        if (rdata[z].vals[i].tInt < minVal) minVal = rdata[z].vals[i].tInt;
+                        if (rdata[z].vals[i].tInt > maxVal) maxVal = rdata[z].vals[i].tInt;
+                    }
+                }
 
-			while (tmZnBegin < tmMaxInterval){
+                ++z;
 
-				if (tmZnEnd > tmMinInterval){
+                if (z < znSz) {
+                    tmZnBegin = sign->buffData[z].beginTime,
+                    tmZnEnd = sign->buffData[z].beginTime + SV_CYCLESAVE_MS;
+                } else
+                    break;
+            }
+            
+            break;
+        case valueType::tFloat:
+            while (tmZnBegin < tmMaxInterval) {
+                if (tmZnEnd > tmMinInterval) {
+                    for (int i = 0; i < SV_PACKETSZ; ++i) {
+                        if (rdata[z].vals[i].tFloat < minVal) minVal = rdata[z].vals[i].tFloat;
+                        if (rdata[z].vals[i].tFloat > maxVal) maxVal = rdata[z].vals[i].tFloat;
+                    }
+                }
 
-					for (int i = 0; i < SV_PACKETSZ; ++i){
+                ++z;
 
-						if (rdata[z].vals[i].tInt < minVal) minVal = rdata[z].vals[i].tInt;
-						if (rdata[z].vals[i].tInt > maxVal) maxVal = rdata[z].vals[i].tInt;
-					}
-				}
+                if (z < znSz) {
+                    tmZnBegin = sign->buffData[z].beginTime,
+                    tmZnEnd = sign->buffData[z].beginTime + SV_CYCLESAVE_MS;
+                } else
+                    break;
+            }
+            break;
+    default:
+        break;
+    }
+    
 
-				++z;
-
-				if (z < znSz){
-					tmZnBegin = sign->buffData[z].beginTime,
-					tmZnEnd = sign->buffData[z].beginTime + SV_CYCLESAVE_MS;
-				}
-				else break;
-			}
-			
-			break;
-		case valueType::tFloat:
-			while (tmZnBegin < tmMaxInterval){
-
-				if (tmZnEnd > tmMinInterval){
-
-					for (int i = 0; i < SV_PACKETSZ; ++i){
-
-						if (rdata[z].vals[i].tFloat < minVal) minVal = rdata[z].vals[i].tFloat;
-						if (rdata[z].vals[i].tFloat > maxVal) maxVal = rdata[z].vals[i].tFloat;
-					}
-				}
-
-				++z;
-
-				if (z < znSz){
-					tmZnBegin = sign->buffData[z].beginTime,
-					tmZnEnd = sign->buffData[z].beginTime + SV_CYCLESAVE_MS;
-				}
-				else break;
-			}
-			break;
-	default:
-		break;
-	}
-	
-
-	return std::pair<double, double>(minVal, maxVal);
+    return std::pair<double, double>(minVal, maxVal);
 }
 
-void wdgGraph::plotUpdate(){
+void wdgGraph::plotUpdate() {
+    if (axisTime_) {
+        auto sref = grPanel_->pfGetCopySignalRef();
+        
+        for (auto& it : signals_) {
+            it.pnts = getSignalPnt(sref[it.sign]);
+        }
 
-	if (axisTime_){
+        for (auto& it : signalsAlter_) {
+            it.pnts = getSignalPnt(sref[it.sign], true);
+        }
 
-		auto sref = grPanel_->pfGetCopySignalRef();
-		for (auto& it : signals_) {
+        repaintEna_ = true;
 
-			it.pnts = getSignalPnt(sref[it.sign]);
-
-		}
-
-		for (auto& it : signalsAlter_) {
-
-			it.pnts = getSignalPnt(sref[it.sign], true);
-
-		}
-
-		repaintEna_ = true;
-
-		ui.wPlot->update();
-
-	}
+        ui.wPlot->update();
+    }
 }
 
-void wdgGraph::axisTimeChange(){
+void wdgGraph::axisTimeChange() {
 
-	if (axisTime_){
-		
-		auto sref = grPanel_->pfGetCopySignalRef();
+    if (axisTime_) {
+        auto sref = grPanel_->pfGetCopySignalRef();
 
-		for (auto& it : signals_) {
-			it.pnts = getSignalPnt(sref[it.sign]);
-		}
+        for (auto& it : signals_) {
+            it.pnts = getSignalPnt(sref[it.sign]);
+        }
 
-		for (auto& it : signalsAlter_) {
-			it.pnts = getSignalPnt(sref[it.sign], true);
-		}
+        for (auto& it : signalsAlter_) {
+            it.pnts = getSignalPnt(sref[it.sign], true);
+        }
 
-		repaintEna_ = true;
+        repaintEna_ = true;
 
-		axisTime_->update();
-		ui.wPlot->update();
-	}	
+        axisTime_->update();
+        ui.wPlot->update();
+    }
 }
 
-void wdgGraph::axisValueChange(){
-	
-	if (axisTime_){
-		auto sref = grPanel_->pfGetCopySignalRef();
+void wdgGraph::axisValueChange() {
+    
+    if (axisTime_) {
+        auto sref = grPanel_->pfGetCopySignalRef();
 
-		for (auto& it : signals_) {
-			it.pnts = getSignalPnt(sref[it.sign]);
-		}
+        for (auto& it : signals_) {
+            it.pnts = getSignalPnt(sref[it.sign]);
+        }
 
-		for (auto& it : signalsAlter_) {
-			it.pnts = getSignalPnt(sref[it.sign], true);
-		}
-		
-		repaintEna_ = true;
-       
-		ui.wAxisValue->update();
-		ui.wPlot->update();
-		
-	}
+        for (auto& it : signalsAlter_) {
+            it.pnts = getSignalPnt(sref[it.sign], true);
+        }
+
+        repaintEna_ = true;
+
+        ui.wAxisValue->update();
+        ui.wPlot->update();
+    }
 }
 
-void wdgGraph::delSignal(QString sign, bool isLabelSender){
+void wdgGraph::delSignal(QString sign, bool isLabelSender) {
 
-	if (signals_.contains(sign)){
-		
-		if (isLabelSender) sender()->deleteLater();
-		else signals_[sign].lb->deleteLater();
-		
-		for (auto it = signalList_.begin(); it != signalList_.end(); ++it){
-			if (*it == sign){
-				signalList_.erase(it);
-				break;
-			}
-		}
+    if (signals_.contains(sign)) {
+        
+        if (isLabelSender) sender()->deleteLater();
+        else signals_[sign].lb->deleteLater();
+        
+        for (auto it = signalList_.begin(); it != signalList_.end(); ++it) {
+            if (*it == sign) {
+                signalList_.erase(it);
+                break;
+            }
+        }
 
-		signals_[sign].lbLeftMarkVal->deleteLater();
-		signals_[sign].lbRightMarkVal->deleteLater();
-		signals_.remove(sign);
-			
-		repaintEna_ = true;
-		ui.wPlot->update();
+        signals_[sign].lbLeftMarkVal->deleteLater();
+        signals_[sign].lbRightMarkVal->deleteLater();
+        signals_.remove(sign);
 
-		emit req_markerChange(this->objectName());
-	}
+        repaintEna_ = true;
+        ui.wPlot->update();
+
+        emit req_markerChange(this->objectName());
+    }
 }
 
-void wdgGraph::delSignalAlter(QString sign, bool isLabelSender){
+void wdgGraph::delSignalAlter(QString sign, bool isLabelSender) {
 
-	if (signalsAlter_.contains(sign)){
+    if (signalsAlter_.contains(sign)) {
 
-		if (isLabelSender) sender()->deleteLater();
-		else signalsAlter_[sign].lb->deleteLater();
+        if (isLabelSender) sender()->deleteLater();
+        else signalsAlter_[sign].lb->deleteLater();
 
-		for (auto it = signalListAlter_.begin(); it != signalListAlter_.end(); ++it){
-			if (*it == sign){
-				signalListAlter_.erase(it);
-				break;
-			}
-		}
+        for (auto it = signalListAlter_.begin(); it != signalListAlter_.end(); ++it) {
+            if (*it == sign) {
+                signalListAlter_.erase(it);
+                break;
+            }
+        }
 
-		signalsAlter_[sign].lbLeftMarkVal->deleteLater();
-		signalsAlter_[sign].lbRightMarkVal->deleteLater();
-		signalsAlter_.remove(sign);
+        signalsAlter_[sign].lbLeftMarkVal->deleteLater();
+        signalsAlter_[sign].lbRightMarkVal->deleteLater();
+        signalsAlter_.remove(sign);
 
-		repaintEna_ = true;
-		ui.wPlot->update();
-		emit req_markerChange(this->objectName());
-	}
+        repaintEna_ = true;
+        ui.wPlot->update();
+        emit req_markerChange(this->objectName());
+    }
 }
 
-void wdgGraph::resizeByTime(){
+void wdgGraph::resizeByTime() {
 
-	if (signalList_.isEmpty()&& signalsAlter_.isEmpty()) return;
+    if (signalList_.isEmpty()&& signalsAlter_.isEmpty()) return;
 
-	double minTm = INT64_MAX, maxTm = -INT64_MAX;
+    double minTm = INT64_MAX, maxTm = -INT64_MAX;
     auto sref = grPanel_->pfGetCopySignalRef();
 
-	for (auto& sign : signalList_){
-		
-		if (sref[sign]->buffMinTime < minTm) minTm = sref[sign]->buffMinTime;
-		if (sref[sign]->buffMaxTime > maxTm) maxTm = sref[sign]->buffMaxTime;
-	}
+    for (auto& sign : signalList_) {
+        if (sref[sign]->buffMinTime < minTm) minTm = sref[sign]->buffMinTime;
+        if (sref[sign]->buffMaxTime > maxTm) maxTm = sref[sign]->buffMaxTime;
+    }
 
-	for (auto& sname : signalListAlter_){
-		
-		if (sref[sname]->buffMinTime < minTm) minTm = sref[sname]->buffMinTime;
-		if (sref[sname]->buffMaxTime > maxTm) maxTm = sref[sname]->buffMaxTime;
-	}
-	
-	axisTime_->setTimeInterval(minTm, maxTm);
-	
-	axisTimeChange();
-	emit req_axisTimeUpdate(this->objectName()); 
-	
+    for (auto& sname : signalListAlter_) {
+        if (sref[sname]->buffMinTime < minTm) minTm = sref[sname]->buffMinTime;
+        if (sref[sname]->buffMaxTime > maxTm) maxTm = sref[sname]->buffMaxTime;
+    }
+
+    axisTime_->setTimeInterval(minTm, maxTm);
+
+    axisTimeChange();
+    emit req_axisTimeUpdate(this->objectName()); 
+
 }
 
-void wdgGraph::resizeByValue(){
-	
-	if (signals_.isEmpty()) return;
+void wdgGraph::resizeByValue() {
 
-	double minVal = INT32_MAX, maxVal = -INT32_MAX; bool isFloatSign = false;
-	for (auto& sign : signals_){
+    if (signals_.isEmpty()) return;
 
-		if (sign.type != valueType::tBool){
+    double minVal = INT32_MAX, maxVal = -INT32_MAX; bool isFloatSign = false;
+    for (auto& sign : signals_) {
 
-			isFloatSign = true; std::pair<double, double> minMaxVal = getSignMaxMinValue(&sign);
+        if (sign.type != valueType::tBool) {
 
-			if (minMaxVal.first < minVal) minVal = minMaxVal.first;
-			if (minMaxVal.second > maxVal) maxVal = minMaxVal.second;
-		}			
-	}
+            isFloatSign = true;
+            std::pair<double, double> minMaxVal = getSignMaxMinValue(&sign);
 
-	if (isFloatSign){
+            if (minMaxVal.first < minVal) minVal = minMaxVal.first;
+            if (minMaxVal.second > maxVal) maxVal = minMaxVal.second;
+        }
+    }
 
-		std::pair<double, double> intl = ui.wAxisValue->getValInterval();
-	
-		double scale = ui.wAxisValue->getValScale();
-		ui.wAxisValue->setValInterval(intl.first + minVal * scale - 1, intl.first + maxVal * scale + 1);
-	
-		axisValueChange();
-	}
+    if (isFloatSign) {
+
+        std::pair<double, double> intl = ui.wAxisValue->getValInterval();
+
+        double scale = ui.wAxisValue->getValScale();
+        ui.wAxisValue->setValInterval(intl.first + minVal * scale - 1, intl.first + maxVal * scale + 1);
+
+        axisValueChange();
+    }
 }
 
-void wdgGraph::resizeByRect(){
+void wdgGraph::resizeByRect() {
 
-	QRect rct = ui.wPlot->SelRect;
-	ui.wPlot->SelRect = QRect(0, 0, 0, 0);
+    QRect rct = ui.wPlot->SelRect;
+    ui.wPlot->SelRect = QRect(0, 0, 0, 0);
 
-	if ((rct.width() < 30) || (rct.height() < 30)){
-		plotUpdate();
-		return;
-	}
+    if ((rct.width() < 30) || (rct.height() < 30)) {
+        plotUpdate();
+        return;
+    }
 
-	addPosToHistory();
+    addPosToHistory();
 
-	std::pair<qint64, qint64> tmIntl = axisTime_->getTimeInterval();
+    std::pair<qint64, qint64> tmIntl = axisTime_->getTimeInterval();
 
     qint64 tmBegin = tmIntl.first + rct.x() * axisTime_->getTimeScale();
     qint64 tmEnd = tmIntl.first + (rct.x() + rct.width()) *axisTime_->getTimeScale();
-	
-	axisTime_->setTimeInterval(tmBegin, tmEnd);
-	
-	std::pair<double, double> valIntl = ui.wAxisValue->getValInterval();
 
-	double valBegin = valIntl.first + (ui.wPlot->height() - rct.y() - rct.height()) * ui.wAxisValue->getValScale();
-	double valEnd = valIntl.first + (ui.wPlot->height() - rct.y()) * ui.wAxisValue->getValScale();
+    axisTime_->setTimeInterval(tmBegin, tmEnd);
 
-	ui.wAxisValue->setValInterval(valBegin, valEnd);
+    std::pair<double, double> valIntl = ui.wAxisValue->getValInterval();
 
-	
-	axisTime_->update();
-	ui.wAxisValue->update();
-	plotUpdate();
-	
-	emit req_axisTimeUpdate(this->objectName());
+    double valBegin = valIntl.first + (ui.wPlot->height() - rct.y() - rct.height()) * ui.wAxisValue->getValScale();
+    double valEnd = valIntl.first + (ui.wPlot->height() - rct.y()) * ui.wAxisValue->getValScale();
+
+    ui.wAxisValue->setValInterval(valBegin, valEnd);
+
+    axisTime_->update();
+    ui.wAxisValue->update();
+    plotUpdate();
+
+    emit req_axisTimeUpdate(this->objectName());
 
 }
 
-void wdgGraph::updateByMarker(){
-
-	if (axisTime_){
-		
-		ui.wPlot->update();
-
-		emit req_markerChange(this->objectName());
-
-	}
+void wdgGraph::updateByMarker() {
+    if (axisTime_) {
+        ui.wPlot->update();
+        emit req_markerChange(this->objectName());
+    }
 }
 
-std::vector<wdgGraph::graphSignPoint> wdgGraph::getSignalValueByMarkerPos(int pos){
+std::vector<wdgGraph::graphSignPoint> wdgGraph::getSignalValueByMarkerPos(int pos) {
 
-	std::vector<graphSignPoint> res;
+    std::vector<graphSignPoint> res;
 
-	std::pair<double,double> valIntr = ui.wAxisValue->getValInterval();
-	double valScale = ui.wAxisValue->getValScale();
+    std::pair<double,double> valIntr = ui.wAxisValue->getValInterval();
+    double valScale = ui.wAxisValue->getValScale();
 
-	int sz = signalList_.size();
-	for (int i = 0; i < sz; ++i){
-		
-		auto sign = signals_[signalList_[i]];
-		res.push_back(graphSignPoint());
+    int sz = signalList_.size();
+    for (int i = 0; i < sz; ++i) {
+        
+        auto sign = signals_[signalList_[i]];
+        res.push_back(graphSignPoint());
         res[i].sign = signalList_[i];
-		res[i].name = sign.name;
-		res[i].type = sign.type;
-		res[i].color = sign.color;
+        res[i].name = sign.name;
+        res[i].type = sign.type;
+        res[i].color = sign.color;
 
-		int sZn = sign.pnts.size(); bool exist = false;
-		for (int zn = 0; zn < sZn; ++zn){
+        int sZn = sign.pnts.size(); bool exist = false;
+        for (int zn = 0; zn < sZn; ++zn) {
 
-			int prev = sign.pnts[zn][0].first;
-			for (auto pt : sign.pnts[zn]){
-				
-				if ((pt.first == pos) || ((prev < pos) && (pos < pt.first))){
-										
-					if (sign.type != valueType::tBool)
-						res[i].val = pt.second * valScale + valIntr.first;
-					else 
-						res[i].val = pt.second;
+            int prev = sign.pnts[zn][0].first;
+            for (auto pt : sign.pnts[zn]) {
+                
+                if ((pt.first == pos) || ((prev < pos) && (pos < pt.first))) {
+                                        
+                    if (sign.type != valueType::tBool)
+                        res[i].val = pt.second * valScale + valIntr.first;
+                    else 
+                        res[i].val = pt.second;
 
-					res[i].xPix = pos;
-					res[i].yPix = pt.second;
-					exist = true;
-					break;
-				}
-				prev = pt.first;
-			}
-			if (exist) break;
-		}
-	}
+                    res[i].xPix = pos;
+                    res[i].yPix = pt.second;
+                    exist = true;
+                    break;
+                }
+                prev = pt.first;
+            }
+            if (exist) break;
+        }
+    }
 
-	return res;
+    return res;
 }
 
-std::vector<wdgGraph::graphSignPoint> wdgGraph::getSignalAlterValueByMarkerPos(int pos){
+std::vector<wdgGraph::graphSignPoint> wdgGraph::getSignalAlterValueByMarkerPos(int pos) {
 
-	std::vector<graphSignPoint> res;
+    std::vector<graphSignPoint> res;
 
-	int sz = signalListAlter_.size();
-	for (int i = 0; i < sz; ++i){
+    int sz = signalListAlter_.size();
+    for (int i = 0; i < sz; ++i) {
 
-		auto sign = signalsAlter_[signalListAlter_[i]];
+        auto sign = signalsAlter_[signalListAlter_[i]];
 
-		auto sdata = grPanel_->pfGetSignalData(signalListAlter_[i]);
+        auto sdata = grPanel_->pfGetSignalData(signalListAlter_[i]);
 
-		std::pair<qint64, qint64> tmInterval = axisTime_->getTimeInterval();
-		std::pair<double, double> valInterval = getSignMaxMinValue(sdata, tmInterval);
-		double valMinInterval = valInterval.first - 1, valMaxInterval = valInterval.second + 3;
-		double valScale = (valMaxInterval - valMinInterval) / ui.wPlot->height();
+        std::pair<qint64, qint64> tmInterval = axisTime_->getTimeInterval();
+        std::pair<double, double> valInterval = getSignMaxMinValue(sdata, tmInterval);
+        double valMinInterval = valInterval.first - 1, valMaxInterval = valInterval.second + 3;
+        double valScale = (valMaxInterval - valMinInterval) / ui.wPlot->height();
 
-		res.push_back(graphSignPoint());
-		res[i].sign = signalListAlter_[i];
-		res[i].name = sign.name;
-		res[i].type = sign.type;
-		res[i].color = sign.color;
+        res.push_back(graphSignPoint());
+        res[i].sign = signalListAlter_[i];
+        res[i].name = sign.name;
+        res[i].type = sign.type;
+        res[i].color = sign.color;
 
-		int sZn = sign.pnts.size(); bool exist = false;
-		for (int zn = 0; zn < sZn; ++zn){
+        int sZn = sign.pnts.size(); bool exist = false;
+        for (int zn = 0; zn < sZn; ++zn) {
 
-			int prev = sign.pnts[zn][0].first;
-			for (auto pt : sign.pnts[zn]){
+            int prev = sign.pnts[zn][0].first;
+            for (auto pt : sign.pnts[zn]) {
 
-				if ((pt.first == pos) || ((prev < pos) && (pos < pt.first))){
+                if ((pt.first == pos) || ((prev < pos) && (pos < pt.first))) {
 
-					if (sign.type != valueType::tBool)
-						res[i].val = pt.second * valScale + valMinInterval;
-					else
-						res[i].val = pt.second;
+                    if (sign.type != valueType::tBool)
+                        res[i].val = pt.second * valScale + valMinInterval;
+                    else
+                        res[i].val = pt.second;
 
-					res[i].xPix = pos;
-					res[i].yPix = pt.second;
+                    res[i].xPix = pos;
+                    res[i].yPix = pt.second;
 
-					exist = true;
-					break;
-				}
-				prev = pt.first;
-			}
-			if (exist) break;
-		}
-	}
+                    exist = true;
+                    break;
+                }
+                prev = pt.first;
+            }
+            if (exist) break;
+        }
+    }
 
-	return res;
+    return res;
 }
-void wdgGraph::undoCmd(){
+void wdgGraph::undoCmd() {
 
-	if (historyPos_.empty()) return;
+    if (historyPos_.empty()) return;
 
-	histPos histP = historyPos_.back();
+    histPos histP = historyPos_.back();
 
-	axisTime_->setTimeInterval(histP.tmIntl.first, histP.tmIntl.second);
-		
-	ui.wAxisValue->setValInterval(histP.valIntl.first, histP.valIntl.second);
+    axisTime_->setTimeInterval(histP.tmIntl.first, histP.tmIntl.second);
+        
+    ui.wAxisValue->setValInterval(histP.valIntl.first, histP.valIntl.second);
 
-	axisTime_->update();
-	ui.wAxisValue->update();
-	plotUpdate();
+    axisTime_->update();
+    ui.wAxisValue->update();
+    plotUpdate();
 
-	if (historyPos_.size() > 1) historyPos_.pop_back();
+    if (historyPos_.size() > 1) historyPos_.pop_back();
 
-	emit req_axisTimeUpdate(this->objectName());
+    emit req_axisTimeUpdate(this->objectName());
 }
 
-void wdgGraph::colorUpdate(){
+void wdgGraph::colorUpdate() {
 
-	for (auto& it : signals_) {
+    for (auto& it : signals_) {
 
-		colorCnt_ += 30;
+        colorCnt_ += 30;
 
-		int num = it.num;
-		QColor clr = QColor((num * (60 + colorCnt_)) % 255,
-			(num * (120 + colorCnt_)) % 255,
-			(num * (180 + colorCnt_)) % 255, 255);
+        int num = it.num;
+        QColor clr = QColor((num * (60 + colorCnt_)) % 255,
+            (num * (120 + colorCnt_)) % 255,
+            (num * (180 + colorCnt_)) % 255, 255);
 
-		it.color = clr;
+        it.color = clr;
 
-		it.lb->setStyleSheet("color : " + clr.name() + "; ");
+        it.lb->setStyleSheet("color : " + clr.name() + "; ");
         it.lbLeftMarkVal->setStyleSheet("color : " + clr.name() + "; ");
-		it.lbRightMarkVal->setStyleSheet("color : " + clr.name() + "; ");
+        it.lbRightMarkVal->setStyleSheet("color : " + clr.name() + "; ");
 
-	}
+    }
 
-	for (auto& it : signalsAlter_) {
+    for (auto& it : signalsAlter_) {
 
-		colorCnt_ += 30;
+        colorCnt_ += 30;
 
-		int num = it.num;
-		QColor clr = QColor((num * (60 + colorCnt_)) % 255,
-			(num * (120 + colorCnt_)) % 255,
-			(num * (180 + colorCnt_)) % 255, 255);
+        int num = it.num;
+        QColor clr = QColor((num * (60 + colorCnt_)) % 255,
+            (num * (120 + colorCnt_)) % 255,
+            (num * (180 + colorCnt_)) % 255, 255);
 
-		it.color = clr;
+        it.color = clr;
 
-		it.lb->setStyleSheet("color : " + clr.name() + "; ");
-		it.lbLeftMarkVal->setStyleSheet("color : " + clr.name() + "; ");
-		it.lbRightMarkVal->setStyleSheet("color : " + clr.name() + "; ");
-	}
-	repaintEna_ = true;
-	ui.wPlot->update();
+        it.lb->setStyleSheet("color : " + clr.name() + "; ");
+        it.lbLeftMarkVal->setStyleSheet("color : " + clr.name() + "; ");
+        it.lbRightMarkVal->setStyleSheet("color : " + clr.name() + "; ");
+    }
+    repaintEna_ = true;
+    ui.wPlot->update();
 
-	emit req_markerChange(this->objectName());
+    emit req_markerChange(this->objectName());
 }
 
-void wdgGraph::showMarkPos(){
-		QPoint leftMarkPos, rightMarkPos;
-		getMarkersPos(leftMarkPos, rightMarkPos);
+void wdgGraph::showMarkPos() {
+    QPoint leftMarkPos, rightMarkPos;
+    getMarkersPos(leftMarkPos, rightMarkPos);
 
-		int crPos = ui.wPlot->mapFromGlobal(QCursor::pos()).x();
-		if (abs(crPos - leftMarkPos.x()) > abs(crPos - rightMarkPos.x())){
-			rightMarkPos.setX(crPos);
-			selRigthMark_ = true;
-		}
-		else{
-			leftMarkPos.setX(crPos);
-			selLeftMark_ = true;
-		}
-		setMarkersPos(leftMarkPos, rightMarkPos);
-		updateByMarker();
+    int crPos = ui.wPlot->mapFromGlobal(QCursor::pos()).x();
+    if (abs(crPos - leftMarkPos.x()) > abs(crPos - rightMarkPos.x())) {
+        rightMarkPos.setX(crPos);
+        selRigthMark_ = true;
+    } else {
+        leftMarkPos.setX(crPos);
+        selLeftMark_ = true;
+    }
+    setMarkersPos(leftMarkPos, rightMarkPos);
+    updateByMarker();
 }
 
-void wdgGraph::scale(bool posNeg){
-
-	ui.wPlot->scale(posNeg ? 5 : -5);
+void wdgGraph::scale(bool posNeg) {
+    ui.wPlot->scale(posNeg ? 5 : -5);
 }

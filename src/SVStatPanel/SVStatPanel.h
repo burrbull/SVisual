@@ -38,9 +38,7 @@
 #endif
 
 namespace SV_Stat {
-
 	struct config {
-
 		int cycleRecMs;
 		int packetSz;
 
@@ -65,5 +63,4 @@ namespace SV_Stat {
 
 	typedef void(*pf_setTimeInterval)(qint64, qint64);
 	SVSTATPANEL_API void setSetTimeInterval(QDialog* stPanel, pf_setTimeInterval f);
-
 }

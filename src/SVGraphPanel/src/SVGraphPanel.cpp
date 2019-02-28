@@ -28,67 +28,55 @@
 #include "SVConfig/SVConfigLimits.h"
 #include <QTranslator>
 
-
 namespace SV_Graph {
+    QWidget *createGraphPanel(QWidget *parent, SV_Graph::config cng) {
+                     
+        return new graphPanel(parent, cng);
+    }
 
-	QWidget *createGraphPanel(QWidget *parent, SV_Graph::config cng) {
-				     
-		return new graphPanel(parent, cng);
-	}
+    void setGetCopySignalRef(QWidget *gp, pf_getCopySignalRef f) {
+        if (gp && f)
+            ((graphPanel*) gp)->pfGetCopySignalRef = f;
+    }
 
-	void setGetCopySignalRef(QWidget *gp, pf_getCopySignalRef f) {
+    void setGetSignalData(QWidget *gp, pf_getSignalData f) {
+        if (gp && f)
+            ((graphPanel*) gp)->pfGetSignalData = f;
+    }
 
-		if (gp && f)
-			((graphPanel*) gp)->pfGetCopySignalRef = f;
-	}
-
-	void setGetSignalData(QWidget *gp, pf_getSignalData f) {
-
-		if (gp && f)
-			((graphPanel*) gp)->pfGetSignalData = f;
-	}
-
-	void setLoadSignalData(QWidget *gp, pf_loadSignalData f) {
-
-		if (gp && f)
-			((graphPanel*) gp)->pfLoadSignalData = f;
-	}
-	
+    void setLoadSignalData(QWidget *gp, pf_loadSignalData f) {
+        if (gp && f)
+            ((graphPanel*) gp)->pfLoadSignalData = f;
+    }
+    
     void addSignal(QWidget *gp, QString sname, int section) {
-
-		if (gp)
+        if (gp)
             ((graphPanel*)gp)->addSignalOnGraph(sname, section);
-	}
+    }
 
-	void update(QWidget *gp) {
+    void update(QWidget *gp) {
+        if (gp)
+            ((graphPanel*) gp)->updateSignals();
+    }
 
-		if (gp)
-			((graphPanel*) gp)->updateSignals();
-	}
+    std::pair<qint64, qint64> getTimeInterval(QWidget *gp) {
+        if (gp)
+            return ((graphPanel*) gp)->getTimeInterval();
 
-	std::pair<qint64, qint64> getTimeInterval(QWidget *gp) {
+        return std::pair<qint64, qint64>();
+    }
 
-		if (gp)
-			return ((graphPanel*) gp)->getTimeInterval();
+    void setTimeInterval(QWidget* gp, qint64 stTime, qint64 enTime) {
+        if (gp) {
+            ((graphPanel*)gp)->setTimeInterval(stTime, enTime);
 
-		return std::pair<qint64, qint64>();
-	}
+            ((graphPanel*)gp)->ui.axisTime->update();
 
-	void setTimeInterval(QWidget* gp, qint64 stTime, qint64 enTime) {
+            ((graphPanel*)gp)->resizeByValue();
+        }
+    }
 
-		if (gp) {
-
-			((graphPanel*)gp)->setTimeInterval(stTime, enTime);
-
-			((graphPanel*)gp)->ui.axisTime->update();
-
-			((graphPanel*)gp)->resizeByValue();
-		}
-	}
-
-    std::vector<std::vector<QString>> getLocateSignals(QWidget *gp){
-
+    std::vector<std::vector<QString>> getLocateSignals(QWidget *gp) {
         return gp ? ((graphPanel*)gp)->getLocateSignals() : std::vector<std::vector<QString>>();
-
     }
 }

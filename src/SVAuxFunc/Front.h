@@ -36,8 +36,8 @@ namespace SV_Aux {
 		int oncSz;
 
 	public:
-
-		Front() : oncSz(0) {}
+		Front() : oncSz(0) {
+		}
 
 		/// Польжит фронт
 		/// \param en значение

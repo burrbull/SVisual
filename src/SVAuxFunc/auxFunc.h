@@ -29,7 +29,6 @@
 #include <stdint.h>
 
 namespace SV_Aux {
-
     // тек дата %Y%m%d
     std::string CurrDateS();
 

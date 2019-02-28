@@ -42,14 +42,12 @@
 */
 
 namespace SV_Aux {
-	class Logger {
-
+	class Logger
+	{
 	public:
-
 		// -nameFile - имя файла лога
 		// -path - путь
 		Logger(const std::string &nameFile, const std::string &pathFile) {
-
 			nameFile_ = nameFile;
 			pathSave_ = pathFile;
 
@@ -69,7 +67,6 @@ namespace SV_Aux {
 
 		//
 		void destroy() {
-
 			fStop_ = true;
 			cval_.notify_one();
 			if (thrWriteMess_.joinable()) thrWriteMess_.join();
@@ -84,7 +81,6 @@ namespace SV_Aux {
 		}
 
 		bool WriteLine(const std::string &mess) {
-
 			mtxWr_.lock();
 
 			deqMess_[writeMessCnt_] = Message(true, CurrDateTimeMs(), mess);
@@ -122,11 +118,8 @@ namespace SV_Aux {
 		std::condition_variable cval_;
 		bool fStop_ = false;
 
-
 		void WriteCyc() {
-
 			while (!fStop_) {
-
 				std::unique_lock<std::mutex> lck(mtxRd_);
 				cval_.wait(lck);
 
@@ -149,7 +142,6 @@ namespace SV_Aux {
 		}
 
 		void Init() {
-
 			deqMess_.resize(MAX_CNT_MESS);
 
 			readMessCnt_ = 0;
