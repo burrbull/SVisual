@@ -579,7 +579,6 @@ void wdgGraph::getMarkersPos(QPoint& left, QPoint& right) {
 }
 
 std::vector<std::vector<std::pair<int, int>>> wdgGraph::getSignalPnt(signalData* sign, bool isAlter) {
-
     double tmScale = axisTime_->getTimeScale(); 
     double valScale = ui.wAxisValue->getValScale(); 
 
@@ -630,7 +629,6 @@ std::vector<std::vector<std::pair<int, int>>> wdgGraph::getSignalPnt(signalData*
     int valMem = 0, backVal = 0, prevBackVal = 0, backValInd = -1, prevBackValInd = -2;
     bool isChange = false;
     while (tmZnBegin < tmMaxInterval) {
-
         if (tmZnEnd > tmMinInterval) {
             recData& rd = sign->buffData[z];
 
@@ -750,7 +748,6 @@ std::pair<double, double> wdgGraph::getSignMaxMinValue(graphSignData* sign) {
 }
 
 std::pair<double, double> wdgGraph::getSignMaxMinValue(signalData* sign, std::pair<int64_t, int64_t>& tmInterval) {
-
     uint64_t tmZnBegin = sign->buffMinTime,
         tmZnEnd = sign->buffMaxTime,
         tmMinInterval = tmInterval.first,
@@ -829,7 +826,6 @@ void wdgGraph::plotUpdate() {
 }
 
 void wdgGraph::axisTimeChange() {
-
     if (axisTime_) {
         auto sref = grPanel_->pfGetCopySignalRef();
 
@@ -849,7 +845,6 @@ void wdgGraph::axisTimeChange() {
 }
 
 void wdgGraph::axisValueChange() {
-    
     if (axisTime_) {
         auto sref = grPanel_->pfGetCopySignalRef();
 
@@ -869,12 +864,10 @@ void wdgGraph::axisValueChange() {
 }
 
 void wdgGraph::delSignal(QString sign, bool isLabelSender) {
-
     if (signals_.contains(sign)) {
-        
         if (isLabelSender) sender()->deleteLater();
         else signals_[sign].lb->deleteLater();
-        
+
         for (auto it = signalList_.begin(); it != signalList_.end(); ++it) {
             if (*it == sign) {
                 signalList_.erase(it);
@@ -894,9 +887,7 @@ void wdgGraph::delSignal(QString sign, bool isLabelSender) {
 }
 
 void wdgGraph::delSignalAlter(QString sign, bool isLabelSender) {
-
     if (signalsAlter_.contains(sign)) {
-
         if (isLabelSender) sender()->deleteLater();
         else signalsAlter_[sign].lb->deleteLater();
 
@@ -918,8 +909,8 @@ void wdgGraph::delSignalAlter(QString sign, bool isLabelSender) {
 }
 
 void wdgGraph::resizeByTime() {
-
-    if (signalList_.isEmpty()&& signalsAlter_.isEmpty()) return;
+    if (signalList_.isEmpty()&& signalsAlter_.isEmpty())
+        return;
 
     double minTm = INT64_MAX, maxTm = -INT64_MAX;
     auto sref = grPanel_->pfGetCopySignalRef();
@@ -942,12 +933,11 @@ void wdgGraph::resizeByTime() {
 }
 
 void wdgGraph::resizeByValue() {
-
-    if (signals_.isEmpty()) return;
+    if (signals_.isEmpty())
+        return;
 
     double minVal = INT32_MAX, maxVal = -INT32_MAX; bool isFloatSign = false;
     for (auto& sign : signals_) {
-
         if (sign.type != valueType::tBool) {
 
             isFloatSign = true;
@@ -970,7 +960,6 @@ void wdgGraph::resizeByValue() {
 }
 
 void wdgGraph::resizeByRect() {
-
     QRect rct = ui.wPlot->SelRect;
     ui.wPlot->SelRect = QRect(0, 0, 0, 0);
 
@@ -1011,7 +1000,6 @@ void wdgGraph::updateByMarker() {
 }
 
 std::vector<wdgGraph::graphSignPoint> wdgGraph::getSignalValueByMarkerPos(int pos) {
-
     std::vector<graphSignPoint> res;
 
     auto valIntr = ui.wAxisValue->getValInterval();
@@ -1055,7 +1043,6 @@ std::vector<wdgGraph::graphSignPoint> wdgGraph::getSignalValueByMarkerPos(int po
 }
 
 std::vector<wdgGraph::graphSignPoint> wdgGraph::getSignalAlterValueByMarkerPos(int pos) {
-
     std::vector<graphSignPoint> res;
 
     int sz = signalListAlter_.size();
@@ -1104,8 +1091,8 @@ std::vector<wdgGraph::graphSignPoint> wdgGraph::getSignalAlterValueByMarkerPos(i
     return res;
 }
 void wdgGraph::undoCmd() {
-
-    if (historyPos_.empty()) return;
+    if (historyPos_.empty())
+        return;
 
     histPos histP = historyPos_.back();
 
@@ -1123,9 +1110,7 @@ void wdgGraph::undoCmd() {
 }
 
 void wdgGraph::colorUpdate() {
-
     for (auto& it : signals_) {
-
         colorCnt_ += 30;
 
         int num = it.num;
@@ -1142,7 +1127,6 @@ void wdgGraph::colorUpdate() {
     }
 
     for (auto& it : signalsAlter_) {
-
         colorCnt_ += 30;
 
         int num = it.num;

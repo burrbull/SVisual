@@ -29,8 +29,8 @@
 class wdgAxisValue : public QWidget
 {
     Q_OBJECT
-private:
 
+private:
     int cng_dashHeight_ = 3;
 
     int curDashStep_ = 100;
@@ -45,14 +45,12 @@ private:
 
     int mousePrevPosY_ = 0;
 
-    
     void resizeEvent(QResizeEvent * event);
 
     void drawDashLines(QPainter& painter);
     void drawValMark(QPainter& painter);
 
     QString getValMark(int offs);
-
 
 public:
     wdgAxisValue(QWidget *parent = 0);
@@ -69,7 +67,7 @@ public:
     void mouseMoveEvent(QMouseEvent * event);
     void mousePressEvent(QMouseEvent * event);
     void wheelEvent(QWheelEvent * event);
-    void scale(int delta);
+    void scale(int delta, double zoom2 = 1.0);
 
 protected:
     void paintEvent(QPaintEvent *event) Q_DECL_OVERRIDE;

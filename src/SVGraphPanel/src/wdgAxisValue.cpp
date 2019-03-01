@@ -60,7 +60,7 @@ void wdgAxisValue::mouseMoveEvent(QMouseEvent * event) {
 void wdgAxisValue::mousePressEvent(QMouseEvent * event) {
     mousePrevPosY_ = event->pos().y();
 }
-
+/*
 void wdgAxisValue::scale(int delta) {
     if (delta > 0)
         curDashStep_++;
@@ -97,10 +97,61 @@ void wdgAxisValue::scale(int delta) {
     scale_ = (valInterval_.second - valInterval_.first) / height();
 
     emit req_axisChange();
+}*/
+
+void wdgAxisValue::scale(int delta, double zoom2) {
+    if (delta > 0)
+        curDashStep_++;
+    else
+        curDashStep_--;
+
+    if (curDashStep_ > cng_maxDashStep_)
+        curDashStep_ = cng_minDashStep_;
+    else if (curDashStep_ < cng_minDashStep_)
+        curDashStep_ = cng_maxDashStep_;
+
+    double offs = (double)curInterv_ / 40.0;
+
+    double zoom1 = 2.0 - zoom2;
+
+    double offs1 = offs*zoom1;
+    double offs2 = offs*zoom2;
+
+    double mnoffs = qMin(offs1, offs2);
+    double mxoffs = qMax(offs1, offs2);
+
+    if (mnoffs < 1.0) {
+        offs1 = 1.0;
+        offs2 = 1.0;
+    }
+
+    if (mxoffs > 1000.0 ) {
+        offs1 *= 1000.0 / mxoffs;
+        offs2 *= 1000.0 / mxoffs;
+    }
+
+    if (delta > 0) { 
+        valInterval_.first  += offs1;
+        valInterval_.second -= offs2;
+
+        if (valInterval_.first >= valInterval_.second)
+            valInterval_.first = valInterval_.second - 0.1;
+    } else { 
+        valInterval_.first  -= offs1;
+        valInterval_.second += offs2;
+    }
+
+    curInterv_ = valInterval_.second - valInterval_.first;
+
+    scale_ = (valInterval_.second - valInterval_.first) / height();
+
+    emit req_axisChange();
 }
 
 void wdgAxisValue::wheelEvent(QWheelEvent * event) {
-    scale(event->delta());
+    int mouse_y_pos = event->pos().y();
+    double zoom2 = 2.0 *(double)mouse_y_pos / (double)height();
+    scale(event->delta(), zoom2);
 }
 
 void wdgAxisValue::resizeEvent(QResizeEvent * event) {
