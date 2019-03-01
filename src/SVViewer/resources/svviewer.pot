@@ -1,0 +1,134 @@
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2019-03-01 11:09+0300\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Translate Toolkit 2.2.5\n"
+
+#: MainWin#1
+msgid "SVViewer"
+msgstr ""
+
+#: MainWin#2
+msgid "Модули"
+msgstr ""
+
+#: MainWin#3
+msgid "Группы"
+msgstr ""
+
+#: MainWin#4
+msgid "Имя"
+msgstr ""
+
+#: MainWin#5
+msgid "Тип"
+msgstr ""
+
+#: MainWin#6
+msgid "Группа"
+msgstr ""
+
+#: MainWin#7
+msgid "Комментарий"
+msgstr ""
+
+#: MainWin#8
+msgid "Файл"
+msgstr ""
+
+#: MainWin#9
+msgid "Помощь"
+msgstr ""
+
+#: MainWin#10
+msgid "Открыть"
+msgstr ""
+
+#: MainWin#11
+msgid "Ctrl+O"
+msgstr ""
+
+#: MainWin#12
+msgid "Выход"
+msgstr ""
+
+#: MainWin#13
+msgid "Печать"
+msgstr ""
+
+#: MainWin#14
+msgid "Экспорт"
+msgstr ""
+
+#: MainWin#15
+msgid "Новое окно"
+msgstr ""
+
+#: MainWin#16
+msgid "Сохранить текущее состояние"
+msgstr ""
+
+#: MainWin#17
+msgid "Загрузить состояние окон"
+msgstr ""
+
+#: MainWin#18
+msgid "Добавить"
+msgstr ""
+
+#: MainWin#19
+msgid "Статистика"
+msgstr ""
+
+#: MainWin#20
+msgid "О программе"
+msgstr ""
+
+#: MainWin#21
+msgid "Сохранение состояния окон"
+msgstr ""
+
+#: MainWin#22
+msgid "Загрузка состояния окон"
+msgstr ""
+
+#: MainWin#23
+msgid "About SVisual"
+msgstr ""
+
+#: MainWin#24
+msgid ""
+"<h2>SVViewer </h2><p>Программное обеспечение предназначенное<p>для анализа "
+"сигналов с устройст.<p>2017"
+msgstr ""
+
+#: MainWin#25
+msgid "Модуль"
+msgstr ""
+
+#: MainWin#26
+msgid "Файл не удалось прочитать"
+msgstr ""
+
+#: MainWin#27
+msgid ""
+"<h2>SVisualViewer </h2><p>Copyright &copy; 2017 SVisual.<p>Программное "
+"обеспечение предназначенное<p>для анализа сигналов с устройст.<p> www.s-"
+"visual.com "
+msgstr ""
+
+#: MainWin#28
+msgid "Открытие файлов данных"
+msgstr ""
+
+#: MainWin#29
+msgid "Добавление файлов данных"
+msgstr ""

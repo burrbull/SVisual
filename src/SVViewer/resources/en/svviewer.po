@@ -1,0 +1,136 @@
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2019-03-01 11:09+0300\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Translate Toolkit 2.2.5\n"
+
+#: MainWin#1
+msgid "SVViewer"
+msgstr ""
+
+#: MainWin#2
+msgid "Модули"
+msgstr "Module"
+
+#: MainWin#3
+msgid "Группы"
+msgstr "Group"
+
+#: MainWin#4
+msgid "Имя"
+msgstr "Name"
+
+#: MainWin#5
+msgid "Тип"
+msgstr "Type"
+
+#: MainWin#6
+msgid "Группа"
+msgstr "Group"
+
+#: MainWin#7
+msgid "Комментарий"
+msgstr "Comment"
+
+#: MainWin#8
+msgid "Файл"
+msgstr "File"
+
+#: MainWin#9
+msgid "Помощь"
+msgstr "Help"
+
+#: MainWin#10
+msgid "Открыть"
+msgstr "Open"
+
+#: MainWin#11
+msgid "Ctrl+O"
+msgstr ""
+
+#: MainWin#12
+msgid "Выход"
+msgstr "Exit"
+
+#: MainWin#13
+msgid "Печать"
+msgstr "Print"
+
+#: MainWin#14
+msgid "Экспорт"
+msgstr "Export"
+
+#: MainWin#15
+msgid "Новое окно"
+msgstr "New window"
+
+#: MainWin#16
+msgid "Сохранить текущее состояние"
+msgstr "Save current state"
+
+#: MainWin#17
+msgid "Загрузить состояние окон"
+msgstr "Load state windows"
+
+#: MainWin#18
+msgid "Добавить"
+msgstr "Add"
+
+#: MainWin#19
+msgid "Статистика"
+msgstr "Stat"
+
+#: MainWin#20
+msgid "О программе"
+msgstr "About the program"
+
+#: MainWin#21
+msgid "Сохранение состояния окон"
+msgstr "Save state windows"
+
+#: MainWin#22
+msgid "Загрузка состояния окон"
+msgstr "Load state windows"
+
+#: MainWin#23
+msgid "About SVisual"
+msgstr ""
+
+#: MainWin#24
+msgid ""
+"<h2>SVViewer </h2><p>Программное обеспечение предназначенное<p>для анализа "
+"сигналов с устройст.<p>2017"
+msgstr ""
+
+#: MainWin#25
+msgid "Модуль"
+msgstr "Module"
+
+#: MainWin#26
+msgid "Файл не удалось прочитать"
+msgstr "The file could not be read."
+
+#: MainWin#27
+msgid ""
+"<h2>SVisualViewer </h2><p>Copyright &copy; 2017 SVisual.<p>Программное "
+"обеспечение предназначенное<p>для анализа сигналов с устройст.<p> www.s-"
+"visual.com "
+msgstr ""
+"<h2>SVisualViewer </h2><p>Copyright &copy; 2017 SVisual.<p>Software designed "
+"to analyze signals from devices.<p> www.s-visual.com "
+
+#: MainWin#28
+msgid "Открытие файлов данных"
+msgstr "Open of file data"
+
+#: MainWin#29
+msgid "Добавление файлов данных"
+msgstr "Add of file data"

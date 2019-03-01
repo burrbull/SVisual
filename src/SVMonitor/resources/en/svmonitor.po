@@ -1,0 +1,661 @@
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2019-03-01 11:07+0300\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Translate Toolkit 2.2.5\n"
+
+#: MainWin#1
+msgid "SVisualMonitorDEMO"
+msgstr "SVisualMonitor"
+
+#: MainWin#2
+msgid "Тихий режим"
+msgstr "Quiet mode"
+
+#: MainWin#3
+msgid "О программе"
+msgstr "About the program"
+
+#: MainWin#4
+msgctxt "MainWin#4"
+msgid "Модули"
+msgstr "Modules"
+
+#: MainWin#5
+msgid "SVMonitor"
+msgstr ""
+
+#: MainWin#6
+msgctxt "MainWin#6"
+msgid "Имя"
+msgstr "Name"
+
+#: MainWin#7
+msgctxt "MainWin#7"
+msgid "Тип"
+msgstr "Type"
+
+#: MainWin#8
+msgctxt "MainWin#8"
+msgid "Комментарий"
+msgstr "Comment"
+
+#: MainWin#9
+msgid "Группа"
+msgstr "Group"
+
+#: MainWin#10
+msgid "Файл"
+msgstr "File"
+
+#: MainWin#11
+msgid "Помощь"
+msgstr "Help"
+
+#: MainWin#12
+msgid "Выход"
+msgstr "Exit"
+
+#: MainWin#13
+msgctxt "MainWin#13"
+msgid "Добавить"
+msgstr "Add"
+
+#: MainWin#14
+msgctxt "MainWin#14"
+msgid "Сигналы"
+msgstr "Signals"
+
+#: MainWin#15
+msgctxt "MainWin#15"
+msgid "Настройка уведомлений"
+msgstr "Configuring notifications"
+
+#: MainWin#16
+msgctxt "MainWin#16"
+msgid "Настройки"
+msgstr "Settings"
+
+#: MainWin#17
+msgctxt "MainWin#17"
+msgid "Отчет событий"
+msgstr "Event report"
+
+#: MainWin#18
+msgid "Проверить обновления"
+msgstr ""
+
+#: MainWin#19
+msgid "Печать"
+msgstr "Print"
+
+#: MainWin#20
+msgid "Экспорт"
+msgstr "Export"
+
+#: MainWin#21
+msgid "Новое окно"
+msgstr "New window"
+
+#: MainWin#22
+msgid "Сохранить текущее состояние"
+msgstr "Save current state"
+
+#: MainWin#23
+msgid "Загрузить состояние окон"
+msgstr "Load state windows"
+
+#: MainWin#24
+msgid "Подключение базы данных успешно"
+msgstr "Database Connection successful"
+
+#: MainWin#25
+msgid "Подключение базы данных ошибка"
+msgstr "Database Connection error"
+
+#: MainWin#26
+msgid "About SVisual"
+msgstr ""
+
+#: MainWin#27
+msgid ""
+"<h2>SVisual DEMO v1.0</h2><p>Copyright &copy; 2017 Software Inc.<p>"
+"Программное обеспечение предназначенное<p>для анализа сигналов с устройст.<p>"
+" www.s-visual.com "
+msgstr ""
+"<h2>SVisual DEMO v1.0</h2><p>Copyright &copy; 2017 Software Inc.<p>SVisual "
+"is software designed to analyze signals from devices.<p> www.s-visual.com "
+
+#: MainWin#28
+msgid "Подключение базы данных ошибка: "
+msgstr "Database Connection error: "
+
+#: MainWin#29
+msgid ""
+"<h2>SVisualMonitor </h2><p>Copyright &copy; 2017 SVisual.<p>Программное "
+"обеспечение предназначенное<p>для анализа сигналов с устройст.<p> www.s-"
+"visual.com "
+msgstr ""
+"<h2>SVisualMonitor </h2><p>Copyright &copy; 2017 SVisual.<p>Software "
+"designed to analyze signals from devices.<p> www.s-visual.com "
+
+#: MainWin#30
+msgid "Сохранение состояния окон"
+msgstr "Save state succes"
+
+#: MainWin#31
+msgid "Состояние успешно сохранено"
+msgstr "Save state succes"
+
+#: MainWin#32
+msgid "Загрузка состояния окон"
+msgstr "Load state windows"
+
+#: MainWin#33
+msgid "Состояние успешно загружено"
+msgstr "Load state succes"
+
+#: MainWin#34
+msgid "Инициализация параметров успешно"
+msgstr "Initialization successfully settings"
+
+#: MainWin#35
+msgid "Не найден файл инициализации %1"
+msgstr "Not found ini file %1"
+
+#: MainWin#36
+msgid "Прослушивание %1 порта запущено"
+msgstr "Listening port %1 running"
+
+#: MainWin#37
+msgid "%1 порт недоступен"
+msgstr "%1 port is not available"
+
+#: MainWin#38
+msgid "Сервер tcp запущен: адрес %1 порт %2"
+msgstr "tcp server running: the address %1 port %2"
+
+#: MainWin#39
+msgid "Не удалось запустить tcp сервер: адрес %1 порт %2"
+msgstr "Unable to start the server tcp: address of %1 port %2"
+
+#: MainWin#40
+msgid "Ошибка сохранения сигналов в БД"
+msgstr "Error save signals in DB"
+
+#: MainWin#41
+msgid "Ошибка сохранения триггеров в БД"
+msgstr "Error save triggers in DB"
+
+#: MainWin#42
+msgid "Ошибка сохранения евентов в БД"
+msgstr "Error save events in DB"
+
+#: MainWin#43
+msgid ""
+"Превышен лимит количества сигналов: %1. Стабильная работа не гарантирована."
+msgstr "Signal limit exceeded:% 1. Stable work is not guaranteed."
+
+#: MainWin#44
+msgid "Подключен модуль: "
+msgstr "Module is connected: "
+
+#: MainWin#45
+msgid ""
+"Превышен лимит количества модулей: %1. Стабильная работа не гарантирована."
+msgstr "Exceeded module number limit:% 1. Stable performance is not guaranteed."
+
+#: MainWin#46
+msgid "Отключен модуль: "
+msgstr "Module is disconnected"
+
+#: MainWin#47
+msgid "Закрытие приложения. Сохранение параметров успешно"
+msgstr "Close an application. Save settings successfully"
+
+#: MainWin#48
+msgid "Закрытие приложения. Сохранение параметров ошибка"
+msgstr "Close an application. Saving options error"
+
+#: MainWin#49
+msgid "Отключить"
+msgstr "Shut off"
+
+#: MainWin#50
+msgid "Включить"
+msgstr "Enable"
+
+#: MainWin#51
+msgctxt "MainWin#51"
+msgid "Удалить"
+msgstr "Delete"
+
+#: MainWin#52
+msgid "Сигнал удален "
+msgstr "The signal is deleted "
+
+#: MainWin#53
+msgid "Удалить модуль со всеми сигналами?"
+msgstr "Remove the module with all the signals?"
+
+#: MainWin#54
+msgid "Модуль удален "
+msgstr "Module removed "
+
+#: MainWin#55
+msgid "Сигнал добавлен "
+msgstr "The signal is added "
+
+#: QObject#1
+msgid "Триггер добавлен "
+msgstr "Add trigger"
+
+#: QObject#2
+msgid "Триггер удален "
+msgstr "Del trigger"
+
+#: QObject#3
+msgid "Процесс запущен "
+msgstr "The process launched "
+
+#: QObject#4
+msgid "Процесс запущен"
+msgstr "The process launched "
+
+#: QObject#5
+msgid "Процесс не удалось запустить "
+msgstr "The process failed to start "
+
+#: QObject#6
+msgid "Процесс не удалось запустить"
+msgstr "The process failed to start "
+
+#: QObject#7
+msgid "Подключен модуль '"
+msgstr "Connect module '"
+
+#: QObject#8
+msgid "Отключен модуль '"
+msgstr "Disconnect module '"
+
+#: QObject#9
+msgid "Событие: "
+msgstr "Event"
+
+#: QObject#10
+msgid " Процесс запущен: "
+msgstr "Process is run"
+
+#: QObject#11
+msgid " Путь не найден: "
+msgstr "Path is not found"
+
+#. (obsolete)
+#: SerialPortReader#1
+msgid "Ошибка отправки данных"
+msgstr "Error receiving data"
+
+#: SerialPortReader#2
+msgid "Ошибка получения данных"
+msgstr "Error receiving data"
+
+#: SerialPortReader#3
+msgid "%1 Ошибка получения данных"
+msgstr "%1 Error receiving data"
+
+#: eventOrderClass#1
+msgctxt "eventOrderClass#1"
+msgid "Отчет событий"
+msgstr "Event report"
+
+#: eventOrderClass#2
+msgid "c"
+msgstr "from"
+
+#: eventOrderClass#3
+msgid "по"
+msgstr "by"
+
+#: eventOrderClass#4
+msgid "Показать"
+msgstr "Show"
+
+#: eventOrderClass#5
+msgid "Время срабатывания"
+msgstr "Reaction time"
+
+#: eventOrderClass#6
+msgid "Результат"
+msgstr "Result"
+
+#: eventOrderClass#7
+msgid "Название"
+msgstr "Name"
+
+#: eventOrderClass#8
+msgid "Сигнал"
+msgstr "Signal"
+
+#: eventOrderClass#9
+msgid "Модуль"
+msgstr "Module"
+
+#: eventOrderClass#10
+msgid "Время"
+msgstr "Time"
+
+#: eventOrderClass#11
+msgid "Триггер"
+msgstr "Trigger"
+
+#: eventOrderClass#12
+msgctxt "eventOrderClass#12"
+msgid "Условие"
+msgstr "Condition"
+
+#: eventOrderClass#13
+msgid "Атрибуты"
+msgstr "Attributes"
+
+#: registrWinClass#1
+msgid "Активация"
+msgstr "Activation"
+
+#: registrWinClass#2
+msgid "Логин"
+msgstr "Login"
+
+#: registrWinClass#3
+msgid "Пароль"
+msgstr "Password"
+
+#: registrWinClass#4
+msgid "Активировать"
+msgstr "Activate"
+
+#: settingsPanel#1
+msgid "Выбор пути сохранения файлов записи"
+msgstr "Choosing ways to preserve the recording files"
+
+#: settingsPanel#2
+msgid "Изменения вступят в силу после перезагрузки"
+msgstr "Changes will take effect after a reboot"
+
+#. (obsolete)
+#: settingsPanel#3
+msgid "Требуется перезагрузка"
+msgstr "Requires restart"
+
+#: settingsPanelClass#1
+msgctxt "settingsPanelClass#1"
+msgid "Настройки"
+msgstr "Settings"
+
+#: settingsPanelClass#2
+msgid "Получение данных"
+msgstr "Retrieving data"
+
+#: settingsPanelClass#3
+msgid "соединение по COM"
+msgstr "connect of the COM"
+
+#: settingsPanelClass#4
+msgid "порт"
+msgstr "port"
+
+#: settingsPanelClass#5
+msgid "скорость"
+msgstr "speed"
+
+#: settingsPanelClass#6
+msgid "соединение по Ethernet"
+msgstr "connect of the Ethernet"
+
+#: settingsPanelClass#7
+msgid "ip адрес"
+msgstr "ip addr"
+
+#: settingsPanelClass#8
+msgid "соединение по COM/UART"
+msgstr "Connect of COM/UART"
+
+#: settingsPanelClass#9
+msgid "1200"
+msgstr ""
+
+#: settingsPanelClass#10
+msgid "2400"
+msgstr ""
+
+#: settingsPanelClass#11
+msgid "4800"
+msgstr ""
+
+#: settingsPanelClass#12
+msgid "9600"
+msgstr ""
+
+#: settingsPanelClass#13
+msgid "19200"
+msgstr ""
+
+#: settingsPanelClass#14
+msgid "38400"
+msgstr ""
+
+#: settingsPanelClass#15
+msgid "57600"
+msgstr ""
+
+#: settingsPanelClass#16
+msgid "115200"
+msgstr ""
+
+#: settingsPanelClass#17
+msgid "Сохранение данных"
+msgstr "Save data archive"
+
+#: settingsPanelClass#18
+msgctxt "settingsPanelClass#18"
+msgid "Активно"
+msgstr "Active"
+
+#: settingsPanelClass#19
+msgid "путь"
+msgstr "path"
+
+#: settingsPanelClass#20
+msgid "Настройка измерений"
+msgstr "Measurement Setup"
+
+#: settingsPanelClass#21
+msgid "Период записи"
+msgstr "Recording period"
+
+#: settingsPanelClass#22
+msgid " мс"
+msgstr "ms"
+
+#: settingsPanelClass#23
+msgid "Размер пакета"
+msgstr "Size of packet"
+
+#: settingsPanelClass#24
+msgid "интервал"
+msgstr "interval"
+
+#: settingsPanelClass#25
+msgid "час"
+msgstr "hour"
+
+#. (obsolete)
+#: settingsPanelClass#26
+msgid "интервал создания файлов"
+msgstr "file creation interval"
+
+#. (obsolete)
+#: settingsPanelClass#27
+msgid "час [1..12]"
+msgstr "hour"
+
+#: settingsPanelClass#28
+msgctxt "settingsPanelClass#28"
+msgid "*"
+msgstr ""
+
+#: settingsPanelClass#29
+msgid "Сохранить"
+msgstr "Save"
+
+#: triggerPanel#1
+msgid ""
+"Превышен лимит количества триггеров: %1. Стабильная работа не гарантирована."
+msgstr ""
+"Exceeded the number of triggers:% 1. Stable performance is not guaranteed."
+
+#: triggerPanel#2
+msgid "Выбор процесса"
+msgstr "Select of process"
+
+#: triggerPanelClass#1
+msgctxt "triggerPanelClass#1"
+msgid "Настройка уведомлений"
+msgstr "Configuring notifications"
+
+#: triggerPanelClass#2
+msgctxt "triggerPanelClass#2"
+msgid "Модули"
+msgstr "Modules"
+
+#: triggerPanelClass#3
+msgctxt "triggerPanelClass#3"
+msgid "Сигналы"
+msgstr "Signals"
+
+#: triggerPanelClass#4
+msgctxt "triggerPanelClass#4"
+msgid "Имя"
+msgstr "Name"
+
+#: triggerPanelClass#5
+msgctxt "triggerPanelClass#5"
+msgid "Тип"
+msgstr "Type"
+
+#: triggerPanelClass#6
+msgctxt "triggerPanelClass#6"
+msgid "Комментарий"
+msgstr "Comment"
+
+#: triggerPanelClass#7
+msgid "Триггеры"
+msgstr "Triggers"
+
+#: triggerPanelClass#8
+msgctxt "triggerPanelClass#8"
+msgid "Условие"
+msgstr "Condition"
+
+#: triggerPanelClass#9
+msgctxt "triggerPanelClass#9"
+msgid "*"
+msgstr ""
+
+#: triggerPanelClass#10
+msgctxt "triggerPanelClass#10"
+msgid "Добавить"
+msgstr "Add"
+
+#: triggerPanelClass#11
+msgid "Изменить"
+msgstr "Change"
+
+#: triggerPanelClass#12
+msgctxt "triggerPanelClass#12"
+msgid "Удалить"
+msgstr "Delete"
+
+#: triggerPanelClass#13
+msgid "Условие срабатывания"
+msgstr "Operation condition"
+
+#: triggerPanelClass#14
+msgid "меньше"
+msgstr "less"
+
+#: triggerPanelClass#15
+msgid "<"
+msgstr ""
+
+#: triggerPanelClass#16
+msgid "равно"
+msgstr "equally"
+
+#: triggerPanelClass#17
+msgid "=="
+msgstr ""
+
+#: triggerPanelClass#18
+msgid "больше"
+msgstr "more"
+
+#: triggerPanelClass#19
+msgid ">"
+msgstr ""
+
+#: triggerPanelClass#20
+msgid "положительный фронт"
+msgstr "positive front"
+
+#: triggerPanelClass#21
+msgid "FP"
+msgstr ""
+
+#: triggerPanelClass#22
+msgid "отрицательный фронт"
+msgstr "negative front"
+
+#: triggerPanelClass#23
+msgid "FN"
+msgstr ""
+
+#: triggerPanelClass#24
+msgid "пороговое значение"
+msgstr "threshold value"
+
+#: triggerPanelClass#25
+msgid "tout"
+msgstr ""
+
+#: triggerPanelClass#26
+msgid "задержка срабатывания, сек"
+msgstr "response delay, sec"
+
+#: triggerPanelClass#27
+msgid "0"
+msgstr ""
+
+#: triggerPanelClass#28
+msgctxt "triggerPanelClass#28"
+msgid "Активно"
+msgstr "Active"
+
+#: triggerPanelClass#29
+msgid "Запуск процесса"
+msgstr "Running user process"
+
+#: triggerPanelClass#30
+msgid "Путь"
+msgstr "Path"
+
+#: triggerPanelClass#31
+msgid "Аргументы"
+msgstr "Args"

@@ -1,0 +1,113 @@
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2019-03-01 10:55+0300\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Translate Toolkit 2.2.5\n"
+
+#: ExportPanelClass#1
+msgid "Экспорт данных"
+msgstr ""
+
+#: ExportPanelClass#2
+msgid "Модули"
+msgstr ""
+
+#: ExportPanelClass#3
+msgid "Сигналы"
+msgstr ""
+
+#: ExportPanelClass#4
+msgid "Имя"
+msgstr ""
+
+#: ExportPanelClass#5
+msgid "Тип"
+msgstr ""
+
+#: ExportPanelClass#6
+msgid "Комментарий"
+msgstr ""
+
+#: ExportPanelClass#7
+msgid "Добавить"
+msgstr ""
+
+#: ExportPanelClass#8
+msgid "Удалить"
+msgstr ""
+
+#: ExportPanelClass#9
+msgid "Сигналы для экспорта"
+msgstr ""
+
+#: ExportPanelClass#10
+msgid "Модуль"
+msgstr ""
+
+#: ExportPanelClass#11
+msgid "Сигнал"
+msgstr ""
+
+#: ExportPanelClass#12
+msgid "Диапазон времени"
+msgstr ""
+
+#: ExportPanelClass#13
+msgid "Все время"
+msgstr ""
+
+#: ExportPanelClass#14
+msgid "от"
+msgstr ""
+
+#: ExportPanelClass#15
+msgid "до"
+msgstr ""
+
+#: ExportPanelClass#16
+msgid "каждую секунду"
+msgstr ""
+
+#: ExportPanelClass#17
+msgid "каждую минуту"
+msgstr ""
+
+#: ExportPanelClass#18
+msgid "каждое значение"
+msgstr ""
+
+#: ExportPanelClass#19
+msgid "Экспорт"
+msgstr ""
+
+#: exportPanel#1
+msgid "Открытие файла параметров"
+msgstr ""
+
+#: exportPanel#2
+msgid "Создание файла данных"
+msgstr ""
+
+#: exportPanel#3
+msgid "json file (*.jsn);; xlsx file (*.xlsx);; txt file (*.txt)"
+msgstr ""
+
+#: exportPanel#4
+msgid "Успешно сохранен: "
+msgstr ""
+
+#: exportPanel#5
+msgid "Не удалось сохранить: "
+msgstr ""
+
+#: exportPanel#6
+msgid "Не удалось создать файл: "
+msgstr ""

@@ -1,0 +1,113 @@
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2019-03-01 10:55+0300\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Translate Toolkit 2.2.5\n"
+
+#: ExportPanelClass#1
+msgid "Экспорт данных"
+msgstr "Exporting Data"
+
+#: ExportPanelClass#2
+msgid "Модули"
+msgstr "Modules"
+
+#: ExportPanelClass#3
+msgid "Сигналы"
+msgstr "Signals"
+
+#: ExportPanelClass#4
+msgid "Имя"
+msgstr "Name"
+
+#: ExportPanelClass#5
+msgid "Тип"
+msgstr "Type"
+
+#: ExportPanelClass#6
+msgid "Комментарий"
+msgstr "Comment"
+
+#: ExportPanelClass#7
+msgid "Добавить"
+msgstr "Add"
+
+#: ExportPanelClass#8
+msgid "Удалить"
+msgstr "Delete"
+
+#: ExportPanelClass#9
+msgid "Сигналы для экспорта"
+msgstr "Signals for export"
+
+#: ExportPanelClass#10
+msgid "Модуль"
+msgstr "Module"
+
+#: ExportPanelClass#11
+msgid "Сигнал"
+msgstr "Signal"
+
+#: ExportPanelClass#12
+msgid "Диапазон времени"
+msgstr "Time range"
+
+#: ExportPanelClass#13
+msgid "Все время"
+msgstr "All time"
+
+#: ExportPanelClass#14
+msgid "от"
+msgstr "from"
+
+#: ExportPanelClass#15
+msgid "до"
+msgstr "before"
+
+#: ExportPanelClass#16
+msgid "каждую секунду"
+msgstr "every second"
+
+#: ExportPanelClass#17
+msgid "каждую минуту"
+msgstr "every minute"
+
+#: ExportPanelClass#18
+msgid "каждое значение"
+msgstr "each value"
+
+#: ExportPanelClass#19
+msgid "Экспорт"
+msgstr "Export"
+
+#: exportPanel#1
+msgid "Открытие файла параметров"
+msgstr "Creating a file"
+
+#: exportPanel#2
+msgid "Создание файла данных"
+msgstr "Create data file"
+
+#: exportPanel#3
+msgid "json file (*.jsn);; xlsx file (*.xlsx);; txt file (*.txt)"
+msgstr ""
+
+#: exportPanel#4
+msgid "Успешно сохранен: "
+msgstr "Successfully saved:"
+
+#: exportPanel#5
+msgid "Не удалось сохранить: "
+msgstr "Failed to save:"
+
+#: exportPanel#6
+msgid "Не удалось создать файл: "
+msgstr "Could not create file:"

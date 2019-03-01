@@ -1,0 +1,161 @@
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2019-03-01 11:05+0300\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Translate Toolkit 2.2.5\n"
+
+#: graphPanelClass#1
+msgid "graphPanel"
+msgstr ""
+
+#: graphPanelClass#2
+msgid "автошкала [CNTR+A]"
+msgstr "autoscale [CNTR+A]"
+
+#: graphPanelClass#3
+msgid "Ctrl+A"
+msgstr ""
+
+#: graphPanelClass#4
+msgid "автошкала по времени  [CNTR+S]"
+msgstr "autoscale of time [CNTR+S]"
+
+#: graphPanelClass#5
+msgid "[--]"
+msgstr ""
+
+#: graphPanelClass#6
+msgid "Ctrl+S"
+msgstr ""
+
+#: graphPanelClass#7
+msgid "автошкала по амплитуде [CNTR+D]"
+msgstr "autoscale of amplitude [CNTR+D]"
+
+#: graphPanelClass#8
+msgid "Ctrl+D"
+msgstr ""
+
+#: graphPanelClass#9
+msgid "вернуться [CNTR+Z]"
+msgstr "return [CNTR+Z]"
+
+#: graphPanelClass#10
+msgid "Ctrl+Z"
+msgstr ""
+
+#: graphPanelClass#11
+msgid "сменить цвета  [CNTR+F]"
+msgstr "change colors  [CNTR+F]"
+
+#: graphPanelClass#12
+msgid "Ctrl+F"
+msgstr ""
+
+#: graphPanelClass#13
+msgid "масштаб +"
+msgstr "scale +"
+
+#: graphPanelClass#14
+msgid "+"
+msgstr ""
+
+#: graphPanelClass#15
+msgid "масштаб -"
+msgstr "scale -"
+
+#: graphPanelClass#16
+msgid "-"
+msgstr ""
+
+#: graphPanelClass#17
+msgid "автошкала [CTRL+G]"
+msgstr "autoscale"
+
+#: graphPanelClass#18
+msgid "Ctrl+G"
+msgstr ""
+
+#: graphPanelClass#19
+msgid "старт-стоп [SPACE]"
+msgstr "start-stop [SPACE]"
+
+#: graphPanelClass#20
+msgid "Space"
+msgstr ""
+
+#: graphPanelClass#21
+msgid "yy.MM.dd  HH:mm"
+msgstr ""
+
+#: graphPanelClass#22
+msgid "Имя"
+msgstr "Name"
+
+#: graphPanelClass#23
+msgid "Тип"
+msgstr "Type"
+
+#: graphPanelClass#24
+msgid "X1"
+msgstr ""
+
+#: graphPanelClass#25
+msgid "X2"
+msgstr ""
+
+#: graphPanelClass#26
+msgid "X2 - X1"
+msgstr ""
+
+#: graphPanelClass#27
+msgid "Y1"
+msgstr ""
+
+#: graphPanelClass#28
+msgid "Y2"
+msgstr ""
+
+#: graphPanelClass#29
+msgid "Y2 - Y1"
+msgstr ""
+
+#: wdgGraphClass#1
+msgid "wGraph"
+msgstr ""
+
+#: wdgGraphClass#2
+msgid "Переместить вниз"
+msgstr "Move to Up"
+
+#: wdgGraphClass#3
+msgid "Переместить вверх"
+msgstr "Move to Down"
+
+#: wdgGraphClass#4
+msgid "Закрыть"
+msgstr "Close"
+
+#: wdgGraphClass#5
+msgid "переместить вниз"
+msgstr "move down"
+
+#: wdgGraphClass#6
+msgid "переместить вверх"
+msgstr "move up"
+
+#: wdgGraphClass#7
+msgid "закрыть"
+msgstr "close"
+
+#: wdgGraphClass#8
+msgid "X"
+msgstr ""
