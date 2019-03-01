@@ -53,7 +53,7 @@ private:
 
 	struct histPos{
 		std::pair<double, double> valIntl;
-		std::pair<qint64, qint64> tmIntl;
+		std::pair<int64_t, int64_t> tmIntl;
 	};
 
 	QImage imSign_;
@@ -68,7 +68,7 @@ private:
 		
 	std::vector<std::vector<std::pair<int, int>>> getSignalPnt(SV_Cng::signalData* sign, bool isAlter = false);
 	std::pair<double, double > getSignMaxMinValue(graphSignData* sign);
-	std::pair<double, double> getSignMaxMinValue(SV_Cng::signalData* sign, std::pair<qint64, qint64>& tmInterval);
+	std::pair<double, double> getSignMaxMinValue(SV_Cng::signalData* sign, std::pair<int64_t, int64_t>& tmInterval);
 	void addPosToHistory();
 
 	wdgAxisTime* axisTime_ = NULL;

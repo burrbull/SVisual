@@ -45,7 +45,7 @@ void wdgAxisTime::mouseMoveEvent(QMouseEvent * event) {
     if (curOffsPos_ > curDashStep_) curOffsPos_ = 0;
     if (curOffsPos_ < 0) curOffsPos_ = curDashStep_; 
 
-    qint64 offs = -tmScale_ * diff - 1;
+    int64_t offs = -tmScale_ * diff - 1;
     if (diff < 0) offs = -tmScale_ * diff + 1;
 
     tmInterval_.first += offs;
@@ -91,7 +91,7 @@ void wdgAxisTime::scale(int delta) {
         tmInterval_.second += -offs;
 
         if (tmInterval_.first >= tmInterval_.second) {
-            qint64 mdl = abs(tmInterval_.second + tmInterval_.first) / 2;
+            int64_t mdl = abs(tmInterval_.second + tmInterval_.first) / 2;
 
             tmInterval_.first = mdl - 10;
             tmInterval_.second = mdl + 10;
@@ -174,7 +174,7 @@ void wdgAxisTime::paintEvent(QPaintEvent *event) {
     drawTimeMark(painter);
 }
 
-void wdgAxisTime::setTimeInterval(qint64 beginTime, qint64 endTime) {
+void wdgAxisTime::setTimeInterval(int64_t beginTime, int64_t endTime) {
     tmInterval_.first = beginTime;
     tmInterval_.second = endTime;
 
@@ -191,7 +191,7 @@ void wdgAxisTime::setTimeInterval(qint64 beginTime, qint64 endTime) {
     else if (curDashStep_ < fontMetr_ * 1.1) curDashStep_ = 2 * fontMetr_;
 }
 
-std::pair<qint64, qint64> wdgAxisTime::getTimeInterval() {
+std::pair<int64_t, int64_t> wdgAxisTime::getTimeInterval() {
     return tmInterval_;
 }
 

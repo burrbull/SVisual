@@ -180,7 +180,6 @@ void wdgAxisValue::setValInterval(double minv, double maxv) {
 
 std::pair<double, double> wdgAxisValue::getValInterval() {
     return valInterval_;
-
 }
 
 double wdgAxisValue::getValScale() {

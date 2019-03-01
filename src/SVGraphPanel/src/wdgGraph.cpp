@@ -101,9 +101,9 @@ void wdgGraph::resizeEvent(QResizeEvent * event) {
 }
 
 void wdgGraph::addPosToHistory() {
-    std::pair<double, double> valIntl = ui.wAxisValue->getValInterval();
+    auto valIntl = ui.wAxisValue->getValInterval();
 
-    std::pair<qint64, qint64> tmIntl = axisTime_->getTimeInterval();
+    auto tmIntl = axisTime_->getTimeInterval();
 
     historyPos_.push_back(histPos{ valIntl, tmIntl });
 }
@@ -138,7 +138,7 @@ void wdgGraph::paintSignals() {
         painter.drawLine(0, h - axisMarkY[i], w, h - axisMarkY[i]);
     }
 
-    std::pair<qint64, qint64> tmInterv = axisTime_->getTimeInterval();
+    auto tmInterv = axisTime_->getTimeInterval();
 
     bool paintPnt = (tmInterv.second - tmInterv.first) < SV_CYCLESAVE_MS;
 
@@ -225,7 +225,7 @@ void wdgGraph::paintSignalsAlter() {
     QPen pn; pn.setColor(Qt::gray); pn.setWidthF(0.2);
     painter.setPen(pn);
 
-    std::pair<qint64, qint64> tmInterv = axisTime_->getTimeInterval();
+    auto tmInterv = axisTime_->getTimeInterval();
 
     bool paintPnt = (tmInterv.second - tmInterv.first) < SV_CYCLESAVE_MS;
 
@@ -320,7 +320,7 @@ void wdgGraph::paintObjects() {
     painter.drawLine(mRightPosX, 0, mRightPosX, h);
 
 
-    std::pair<qint64, qint64 > tmIntl = axisTime_->getTimeInterval();
+    auto tmIntl = axisTime_->getTimeInterval();
     double tmScale = axisTime_->getTimeScale();
 
     if (leftMarker_->IsSelect || selLeftMark_) {
@@ -365,7 +365,7 @@ void wdgGraph::paintObjectsAlter() {
     //// rightMarker
     int mRightPosX = rightMarker_->pos().x() + rightMarker_->width() / 2;
 
-    std::pair<qint64, qint64 > tmIntl = axisTime_->getTimeInterval();
+    auto tmIntl = axisTime_->getTimeInterval();
     double tmScale = axisTime_->getTimeScale();
 
     if (leftMarker_->IsSelect || selLeftMark_) {
@@ -583,8 +583,8 @@ std::vector<std::vector<std::pair<int, int>>> wdgGraph::getSignalPnt(signalData*
     double tmScale = axisTime_->getTimeScale(); 
     double valScale = ui.wAxisValue->getValScale(); 
 
-    std::pair<qint64, qint64> tmInterval = axisTime_->getTimeInterval();
-    std::pair<double, double> valInterval = ui.wAxisValue->getValInterval();
+    auto tmInterval = axisTime_->getTimeInterval();
+    auto valInterval = ui.wAxisValue->getValInterval();
 
     double valMinInterval = valInterval.first, valMaxInterval = valInterval.second;
 
@@ -746,10 +746,10 @@ std::pair<double, double> wdgGraph::getSignMaxMinValue(graphSignData* sign) {
         minVal = 0;
         maxVal = 1;
     }
-    return std::pair<double, double> (minVal, maxVal);
+    return std::make_pair (minVal, maxVal);
 }
 
-std::pair<double, double> wdgGraph::getSignMaxMinValue(signalData* sign, std::pair<qint64, qint64>& tmInterval) {
+std::pair<double, double> wdgGraph::getSignMaxMinValue(signalData* sign, std::pair<int64_t, int64_t>& tmInterval) {
 
     uint64_t tmZnBegin = sign->buffMinTime,
         tmZnEnd = sign->buffMaxTime,
@@ -757,7 +757,7 @@ std::pair<double, double> wdgGraph::getSignMaxMinValue(signalData* sign, std::pa
         tmMaxInterval = tmInterval.second;
 
     if ((tmZnBegin >= tmMaxInterval) || (tmZnEnd <= tmMinInterval))
-        return std::pair<double, double>(0,1);
+        return std::make_pair(0,1);
 
     auto rdata = sign->buffData;
 
@@ -807,7 +807,7 @@ std::pair<double, double> wdgGraph::getSignMaxMinValue(signalData* sign, std::pa
     }
     
 
-    return std::pair<double, double>(minVal, maxVal);
+    return std::make_pair(minVal, maxVal);
 }
 
 void wdgGraph::plotUpdate() {
@@ -951,7 +951,7 @@ void wdgGraph::resizeByValue() {
         if (sign.type != valueType::tBool) {
 
             isFloatSign = true;
-            std::pair<double, double> minMaxVal = getSignMaxMinValue(&sign);
+            auto minMaxVal = getSignMaxMinValue(&sign);
 
             if (minMaxVal.first < minVal) minVal = minMaxVal.first;
             if (minMaxVal.second > maxVal) maxVal = minMaxVal.second;
@@ -960,7 +960,7 @@ void wdgGraph::resizeByValue() {
 
     if (isFloatSign) {
 
-        std::pair<double, double> intl = ui.wAxisValue->getValInterval();
+        auto intl = ui.wAxisValue->getValInterval();
 
         double scale = ui.wAxisValue->getValScale();
         ui.wAxisValue->setValInterval(intl.first + minVal * scale - 1, intl.first + maxVal * scale + 1);
@@ -981,14 +981,14 @@ void wdgGraph::resizeByRect() {
 
     addPosToHistory();
 
-    std::pair<qint64, qint64> tmIntl = axisTime_->getTimeInterval();
+    auto tmIntl = axisTime_->getTimeInterval();
 
-    qint64 tmBegin = tmIntl.first + rct.x() * axisTime_->getTimeScale();
-    qint64 tmEnd = tmIntl.first + (rct.x() + rct.width()) *axisTime_->getTimeScale();
+    int64_t tmBegin = tmIntl.first + rct.x() * axisTime_->getTimeScale();
+    int64_t tmEnd = tmIntl.first + (rct.x() + rct.width()) *axisTime_->getTimeScale();
 
     axisTime_->setTimeInterval(tmBegin, tmEnd);
 
-    std::pair<double, double> valIntl = ui.wAxisValue->getValInterval();
+    auto valIntl = ui.wAxisValue->getValInterval();
 
     double valBegin = valIntl.first + (ui.wPlot->height() - rct.y() - rct.height()) * ui.wAxisValue->getValScale();
     double valEnd = valIntl.first + (ui.wPlot->height() - rct.y()) * ui.wAxisValue->getValScale();
@@ -1014,7 +1014,7 @@ std::vector<wdgGraph::graphSignPoint> wdgGraph::getSignalValueByMarkerPos(int po
 
     std::vector<graphSignPoint> res;
 
-    std::pair<double,double> valIntr = ui.wAxisValue->getValInterval();
+    auto valIntr = ui.wAxisValue->getValInterval();
     double valScale = ui.wAxisValue->getValScale();
 
     int sz = signalList_.size();
@@ -1065,8 +1065,8 @@ std::vector<wdgGraph::graphSignPoint> wdgGraph::getSignalAlterValueByMarkerPos(i
 
         auto sdata = grPanel_->pfGetSignalData(signalListAlter_[i]);
 
-        std::pair<qint64, qint64> tmInterval = axisTime_->getTimeInterval();
-        std::pair<double, double> valInterval = getSignMaxMinValue(sdata, tmInterval);
+        auto tmInterval = axisTime_->getTimeInterval();
+        auto valInterval = getSignMaxMinValue(sdata, tmInterval);
         double valMinInterval = valInterval.first - 1, valMaxInterval = valInterval.second + 3;
         double valScale = (valMaxInterval - valMinInterval) / ui.wPlot->height();
 

@@ -100,7 +100,7 @@ std::vector<recData> statPanel::getSignData(QString sname) {
         return res;
     }
 
-    std::pair<qint64, qint64> tmInterval = pfGetTimeInterval ? pfGetTimeInterval() : std::pair<qint64, qint64>();
+    std::pair<int64_t, int64_t> tmInterval = pfGetTimeInterval ? pfGetTimeInterval() : std::pair<int64_t, int64_t>();
 
     int znSz = sdata->buffData.size();
 

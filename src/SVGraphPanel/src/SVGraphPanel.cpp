@@ -59,14 +59,14 @@ namespace SV_Graph {
             ((graphPanel*) gp)->updateSignals();
     }
 
-    std::pair<qint64, qint64> getTimeInterval(QWidget *gp) {
+    std::pair<int64_t, int64_t> getTimeInterval(QWidget *gp) {
         if (gp)
             return ((graphPanel*) gp)->getTimeInterval();
 
-        return std::pair<qint64, qint64>();
+        return std::pair<int64_t, int64_t>();
     }
 
-    void setTimeInterval(QWidget* gp, qint64 stTime, qint64 enTime) {
+    void setTimeInterval(QWidget* gp, int64_t stTime, int64_t enTime) {
         if (gp) {
             ((graphPanel*)gp)->setTimeInterval(stTime, enTime);
 

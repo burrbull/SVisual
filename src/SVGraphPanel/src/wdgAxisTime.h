@@ -37,7 +37,7 @@ private:
     int fontMetr_ = 0;
     int curIntervSec_ = 0;
 
-    std::pair<qint64, qint64> tmInterval_;
+    std::pair<int64_t, int64_t> tmInterval_;
 
     double tmScale_ = 1.0;
 
@@ -55,9 +55,9 @@ public:
     wdgAxisTime(QWidget *parent = 0);
     ~wdgAxisTime();
 
-    void setTimeInterval(qint64, qint64);
+    void setTimeInterval(int64_t, int64_t);
 
-    std::pair<qint64, qint64> getTimeInterval();
+    std::pair<int64_t, int64_t> getTimeInterval();
 
     double getTimeScale();
 

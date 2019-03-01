@@ -63,8 +63,8 @@ public:
 	SV_Graph::pf_loadSignalData pfLoadSignalData= nullptr;
 
     void addSignalOnGraph(QString name, int section);
-	std::pair<qint64, qint64> getTimeInterval();
-	void setTimeInterval(qint64 stTime, qint64 enTime);
+	std::pair<int64_t, int64_t> getTimeInterval();
+	void setTimeInterval(int64_t stTime, int64_t enTime);
     std::vector<std::vector<QString>> getLocateSignals();
 
 public slots:

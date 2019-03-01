@@ -189,7 +189,7 @@ void MainWin::load() {
     SV_Stat::setGetCopySignalRef(statPanel_, getCopySignalRef);
     SV_Stat::setGetSignalData(statPanel_, getSignalData);
     SV_Stat::setLoadSignalData(statPanel_, loadSignalData);
-    SV_Stat::setSetTimeInterval(statPanel_, [](qint64 st, qint64 en) {
+    SV_Stat::setSetTimeInterval(statPanel_, [](int64_t st, int64_t en) {
         SV_Graph::setTimeInterval(mainWin->graphPanels_[mainWin], st, en);
     });
     SV_Stat::setGetTimeInterval(statPanel_, []() {

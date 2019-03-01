@@ -241,7 +241,7 @@ void graphPanel::tableUpdate(wdgGraph* graph) {
 
     int leftMarkP = leftMarkPos.x(), rightMarkP = rightMarkPos.x();
 
-    std::pair<qint64, qint64> tmInterv = ui.axisTime->getTimeInterval();
+    auto tmInterv = ui.axisTime->getTimeInterval();
     double tmScale = ui.axisTime->getTimeScale();
 
     std::vector<wdgGraph::graphSignPoint> leftMarkVal = graph->getSignalValueByMarkerPos(leftMarkP);
@@ -281,14 +281,15 @@ void graphPanel::tableUpdate(wdgGraph* graph) {
 }
 
 void graphPanel::tableUpdateAlter(wdgGraph* graph) {
-    if (graph->getAllAlterSignals().isEmpty()) return;
+    if (graph->getAllAlterSignals().isEmpty())
+        return;
 
     QPoint leftMarkPos, rightMarkPos;
     graph->getMarkersPos(leftMarkPos, rightMarkPos);
 
     int leftMarkP = leftMarkPos.x(), rightMarkP = rightMarkPos.x();
 
-    std::pair<qint64, qint64> tmInterv = ui.axisTime->getTimeInterval();
+    auto tmInterv = ui.axisTime->getTimeInterval();
     double tmScale = ui.axisTime->getTimeScale();
 
     std::vector<wdgGraph::graphSignPoint> leftMarkVal = graph->getSignalAlterValueByMarkerPos(leftMarkP);
@@ -330,7 +331,7 @@ void graphPanel::tableUpdateAlter(wdgGraph* graph) {
 }
 
 void graphPanel::diapTimeUpdate() {
-    std::pair<qint64, qint64> tIntl = ui.axisTime->getTimeInterval();
+    auto tIntl = ui.axisTime->getTimeInterval();
 
     ui.dTimeBegin->setDateTime(QDateTime::fromMSecsSinceEpoch(tIntl.first));
     ui.dTimeEnd->setDateTime(QDateTime::fromMSecsSinceEpoch(tIntl.second));
@@ -341,7 +342,6 @@ void graphPanel::axisTimeChange(QString obj) {
     diapTimeUpdate();
 
     for (auto ob : graphObj_) {
-
         if (ob->objectName() != obj) 
             ob->plotUpdate();
     }
@@ -360,7 +360,6 @@ void graphPanel::markerChange(QString obj) {
     graph->getMarkersPos(leftMarkPos, rightMarkPos);
 
     for (auto ob : graphObj_) {
-
         if (ob->objectName() != obj) {
             ob->setMarkersPos(leftMarkPos, rightMarkPos);
             ob->ui.wPlot->update();
@@ -431,24 +430,27 @@ void graphPanel::scaleGraph() {
 }
 
 void graphPanel::undoCmd() {
-    if (selGraph_) selGraph_->undoCmd();
+    if (selGraph_)
+        selGraph_->undoCmd();
 }
 
 void graphPanel::colorUpdate() {
-    if (selGraph_) selGraph_->colorUpdate();
+    if (selGraph_)
+        selGraph_->colorUpdate();
 }
 
 void graphPanel::updateSignals() {
-    if (graphObj_.empty() || !isPlay_) return;
+    if (graphObj_.empty() || !isPlay_)
+        return;
 
     if (ui.btnAScale->isChecked()) {
         for (auto ob : graphObj_)
             ob->resizeByValue();
     }
 
-    qint64 bTm = QDateTime::currentDateTime().toMSecsSinceEpoch() - SV_CYCLESAVE_MS;
+    int64_t bTm = QDateTime::currentDateTime().toMSecsSinceEpoch() - SV_CYCLESAVE_MS;
 
-    std::pair<qint64, qint64> tmIntl = ui.axisTime->getTimeInterval();
+    auto tmIntl = ui.axisTime->getTimeInterval();
 
     ui.axisTime->setTimeInterval(bTm - (tmIntl.second - tmIntl.first), bTm);
 
@@ -497,11 +499,11 @@ void graphPanel::graphToDn(QString obj) {
     }
 }
 
-std::pair<qint64, qint64> graphPanel::getTimeInterval() {
+std::pair<int64_t, int64_t> graphPanel::getTimeInterval() {
     return ui.axisTime->getTimeInterval();
 }
 
-void graphPanel::setTimeInterval(qint64 stTime, qint64 enTime) {
+void graphPanel::setTimeInterval(int64_t stTime, int64_t enTime) {
     ui.axisTime->setTimeInterval(stTime, enTime);
 }
 

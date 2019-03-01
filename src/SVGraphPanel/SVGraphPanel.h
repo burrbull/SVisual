@@ -71,9 +71,9 @@ namespace SV_Graph {
 
     SVGRAPHPANEL_API void update(QWidget *gp);
 
-    SVGRAPHPANEL_API std::pair<qint64, qint64> getTimeInterval(QWidget *gp);
+    SVGRAPHPANEL_API std::pair<int64_t, int64_t> getTimeInterval(QWidget *gp);
 
-	SVGRAPHPANEL_API void setTimeInterval(QWidget *gp, qint64 stTime, qint64 enTime);
+	SVGRAPHPANEL_API void setTimeInterval(QWidget *gp, int64_t stTime, int64_t enTime);
 
     SVGRAPHPANEL_API std::vector<std::vector<QString>> getLocateSignals(QWidget *gp);
 

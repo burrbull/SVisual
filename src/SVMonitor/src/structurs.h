@@ -34,7 +34,7 @@ struct userEventData {
     QString userProcPath;      ///< путь к польз процессу
     QString userProcArgs;      ///<
 
-    userEventData(QString triggName_ = "", QString userProcPath_ = "", QString userProcArgs_ = "", qint64 dateTime_ = 0) :
+    userEventData(QString triggName_ = "", QString userProcPath_ = "", QString userProcArgs_ = "", uint64_t dateTime_ = 0) :
         triggName(triggName_), userProcPath(userProcPath_), userProcArgs(userProcArgs_){}
 };
 
